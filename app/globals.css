@@ -1,0 +1,100 @@
+/* app/globals.css */
+
+/* 1. تعريف خط Banana داخل المشروع */
+@font-face {
+  font-family: 'Banana';
+  src: url('/fonts/banana.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* DM Mono for eyebrows, stat labels, nav badge */
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background-hex: #FCF8F5;
+  --grid-line-color: rgba(147, 31, 31, 0.10);
+  --fade-color: #931f1f;
+
+  /* درجات العنابي المفتوحة والمشرقة لصفحة About */
+  --about-vibrant-base: #910404;   
+  --about-super-glow: #e62222;     
+}
+
+/* ── Utility classes ── */
+.font-banana {
+  font-family: 'Banana', sans-serif !important;
+}
+
+/* Nav underline animation */
+.nav-link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background-color: #ffb3b3;
+  transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.nav-link-underline:hover::after {
+  width: 100%;
+}
+
+/* ── design-background ── */
+.design-background {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+}
+
+/* ── HOME PAGE: cream + red grid with right-side fade ── */
+html:not(:has(a[href="/about"].text-\[\#c0392b\])):not(:has(a[href="/about"].text-red-300)) .design-background {
+  background-color: var(--background-hex);
+  background-image:
+    linear-gradient(var(--grid-line-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line-color) 1px, transparent 1px);
+  background-size: 50px 50px;
+  -webkit-mask-image: radial-gradient(circle at right, var(--background-hex) 30%, transparent 85%);
+  mask-image: radial-gradient(circle at right, var(--background-hex) 30%, transparent 85%);
+}
+html:not(:has(a[href="/about"].text-\[\#c0392b\])):not(:has(a[href="/about"].text-red-300)) .design-background::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--fade-color);
+  -webkit-mask-image: radial-gradient(circle at left, transparent 25%, var(--background-hex) 95%);
+  mask-image: radial-gradient(circle at left, transparent 25%, var(--background-hex) 95%);
+  opacity: 0.65;
+}
+
+/* ── ABOUT PAGE: إرجاع الشبكة الكاملة المشرقة مع التوهج الساطع في المنتصف ── */
+html:has(a[href="/about"].text-\[\#c0392b\]) .design-background,
+html:has(a[href="/about"].text-red-300) .design-background {
+  background-color: var(--about-vibrant-base) !important;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px) !important;
+  background-size: 50px 50px !important;
+}
+
+html:has(a[href="/about"].text-\[\#c0392b\]) .design-background::after,
+html:has(a[href="/about"].text-red-300) .design-background::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: radial-gradient(
+    circle at center, 
+    #ff3333 0%, 
+    var(--about-super-glow) 35%, 
+    #b30909 70%, 
+    var(--about-vibrant-base) 100%
+  ) !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  opacity: 0.95 !important;
+}
