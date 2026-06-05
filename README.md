@@ -1,37 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Oracle Club Website
 
-## Getting Started
+Official website project for Oracle Club.
 
-First, run the development server:
+This repository contains the current redesigned version of the Oracle Club website. The website is built as a modern public-facing platform for the club, showcasing the club identity, members, projects, achievements, sponsors, and contact/partnership information.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Current Project Status
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The project is now using the redesigned frontend version as the main website foundation.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The focus is currently on:
+- improving the existing design
+- keeping the website visually consistent
+- updating content and pages
+- preparing the project for team collaboration
+- later adding backend/CMS features if needed
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+# Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Frontend
+- Next.js
+- TypeScript
+- Tailwind CSS
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Backend / Future Expansion
+- Node.js / Next.js API routes may be added later if needed
+- Backend work may include contact handling, admin features, authentication, or CMS integration
 
-## Deploy on Vercel
+## Version Control
+- GitHub
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-"# oracle-club-website" 
+# Website Pages
+
+- Home
+- About
+- Members
+- Projects
+- Achievements
+- Sponsors
+
+Contact information does not need a separate page. It can appear in the footer, Sponsors page, or a contact/partnership section.
+
+---
+
+# Website Purpose
+
+The website is designed to:
+- represent Oracle Club professionally
+- showcase club projects
+- display club achievements and events
+- present club members and departments
+- attract sponsors and partners
+- support future content management by leadership
+
+---
+
+# Main Features
+
+- Modern Oracle Club branding
+- Dark premium visual style
+- Responsive layout
+- Project showcase
+- Members section
+- Achievements and activity history
+- Sponsors and partnership page
+- Contact/partnership information
+- Future support for backend/CMS integration
+
+---
+
+# Development Setup
+
+Clone the repository:
+
+    git clone <repo-link>
+
+Enter the project folder:
+
+    cd oracle-club-website
+
+Install dependencies:
+
+    npm install
+
+Run the development server:
+
+    npm run dev
+
+If Turbopack causes problems, run:
+
+    npx next dev --webpack
+
+---
+
+# Important Notes
+
+- Do not commit `node_modules`
+- Do not commit `.next`
+- Do not commit `.env` files
+- Test the website before pushing changes
+- Keep the design consistent across pages
+- Avoid fake statistics, fake sponsors, or unrealistic claims
+- Use real club/project/sponsor information only
+- Ask before editing shared/global components
