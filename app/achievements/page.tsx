@@ -1,57 +1,324 @@
 // app/achievements/page.tsx
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
+import Navbar from "../components/Navbar";
 
 export default function Achievements() {
-  const benefits = [
-    { id: "01", title: "Real Projects", text: "Public GitHub contributions, deployed products with real users, and portfolio pieces that recruiters can actually verify." },
-    { id: "02", title: "Free Certifications", text: "Oracle Cloud Infrastructure Foundations, Generative AI Professional, GitHub Copilot Pro—all free for members." },
-    { id: "03", title: "Industry Workflow", text: "Two-week sprints, code reviews, pull requests, deployed products. The same way working engineers work every day." },
-    { id: "04", title: "Career Network", text: "Mentorship, referrals, LinkedIn shoutouts when projects ship, real certificates for every contribution." },
-    { id: "05", title: "AI Tools Included", text: "Members get access to Cursor Pro+, ChatGPT Plus, and Google AI Pro through the club's subscription." },
-    { id: "06", title: "All Skill Levels", text: "Just learned your first language? Senior developer? We pair members with mentors and projects that match where you are." }
+  const achievements = [
+    {
+      image: "/achievements/engineering-day.jpg",
+      year: "2026",
+      title: "Engineering Day Participation",
+      text: "Participated in Engineering Day through an interactive booth that introduced students and visitors to Oracle Club's vision, activities, and community impact.",
+    },
+    {
+      image: "/achievements/workshop.jpg",
+      year: "2026",
+      title: "Oracle 'My Future' Initiative",
+      text: "A professional development and career growth initiative by Oracle that empowers participants to strengthen technical skills and earn industry-recognized qualifications.",
+    },
+    {
+      image: "/achievements/techhub.jpg",
+      year: "2026",
+      title: "TechHub Participation",
+      text: "Participated in TechHub at King Abdulaziz University, engaging with workshops, tech sessions, and innovation activities that strengthen digital skills and industry readiness.",
+    },
+    {
+      image: "/achievements/cloud-workshop.jpg",
+      year: "2026",
+      title: "Cloud Computing Workshop",
+      text: "A hands-on workshop led by Rayan AlYasi introducing core cloud computing concepts and practical applications in modern development.",
+    },
+    {
+      image: "/achievements/certifications.jpg",
+      year: "2026",
+      title: "The Unseen Forces of Interaction",
+      text: "An insightful technical session delivered by Joud AlRimi exploring interaction systems and the hidden mechanisms behind user experience design.",
+    },
   ];
 
   return (
     <>
-      <div className="design-background" />
-      
-      {/* NAVBAR */}
-      <nav className="fixed top-0 left-0 w-full z-50 px-10 py-6 text-[#191919]">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain rounded" />
-            <div className="flex flex-col">
-              <span className="font-bold text-sm leading-none">Oracle Club</span>
-              <span className="text-[9px] text-[#931f1f] font-semibold tracking-widest uppercase mt-0.5">KAU · JEDDAH</span>
+      {/* ─────────────────── BACKGROUND ─────────────────── */}
+
+      <div
+        className="fixed inset-0 z-0"
+        style={{ background: "linear-gradient(160deg, #110808 0%, #1c0d0d 50%, #2a1010 100%)" }}
+      />
+
+      {/* FLOATING GEOMETRIC SHAPES */}
+      <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
+
+        {/* LARGE WIREFRAME CUBE — top right */}
+        <motion.div
+          animate={{ rotate: [0, 360] }}
+          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+          className="absolute"
+          style={{ top: "-80px", right: "-60px", width: "420px", height: "420px" }}
+        >
+          <svg viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="80" y="80" width="200" height="200" stroke="rgba(180,30,30,0.22)" strokeWidth="1.2" />
+            <rect x="140" y="140" width="200" height="200" stroke="rgba(180,30,30,0.14)" strokeWidth="1" />
+            <line x1="80"  y1="80"  x2="140" y2="140" stroke="rgba(180,30,30,0.18)" strokeWidth="1" />
+            <line x1="280" y1="80"  x2="340" y2="140" stroke="rgba(180,30,30,0.18)" strokeWidth="1" />
+            <line x1="80"  y1="280" x2="140" y2="340" stroke="rgba(180,30,30,0.18)" strokeWidth="1" />
+            <line x1="280" y1="280" x2="340" y2="340" stroke="rgba(180,30,30,0.18)" strokeWidth="1" />
+          </svg>
+        </motion.div>
+
+        {/* MEDIUM WIREFRAME CUBE — bottom left */}
+        <motion.div
+          animate={{ rotate: [0, -360] }}
+          transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
+          className="absolute"
+          style={{ bottom: "-40px", left: "-30px", width: "280px", height: "280px" }}
+        >
+          <svg viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="50" y="50" width="140" height="140" stroke="rgba(160,25,25,0.20)" strokeWidth="1.2" />
+            <rect x="90" y="90" width="140" height="140" stroke="rgba(160,25,25,0.12)" strokeWidth="1" />
+            <line x1="50"  y1="50"  x2="90"  y2="90"  stroke="rgba(160,25,25,0.16)" strokeWidth="1" />
+            <line x1="190" y1="50"  x2="230" y2="90"  stroke="rgba(160,25,25,0.16)" strokeWidth="1" />
+            <line x1="50"  y1="190" x2="90"  y2="230" stroke="rgba(160,25,25,0.16)" strokeWidth="1" />
+            <line x1="190" y1="190" x2="230" y2="230" stroke="rgba(160,25,25,0.16)" strokeWidth="1" />
+          </svg>
+        </motion.div>
+
+        {/* FLOATING OCTAHEDRON — center-right */}
+        <motion.div
+          animate={{ rotate: [0, 360], y: [0, -18, 0] }}
+          transition={{ rotate: { duration: 35, repeat: Infinity, ease: "linear" }, y: { duration: 7, repeat: Infinity, ease: "easeInOut" } }}
+          className="absolute"
+          style={{ top: "28%", right: "12%", width: "160px", height: "160px" }}
+        >
+          <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="80,10 150,80 80,150 10,80" stroke="rgba(200,35,35,0.30)" strokeWidth="1.3" fill="none" />
+            <line x1="80" y1="10" x2="80" y2="150" stroke="rgba(200,35,35,0.15)" strokeWidth="1" />
+            <line x1="10" y1="80" x2="150" y2="80" stroke="rgba(200,35,35,0.15)" strokeWidth="1" />
+            <polygon points="80,35 125,80 80,125 35,80" stroke="rgba(200,35,35,0.20)" strokeWidth="1" fill="none" />
+          </svg>
+        </motion.div>
+
+        {/* TRIANGLE — upper-left */}
+        <motion.div
+          animate={{ rotate: [0, -360], y: [0, 22, 0] }}
+          transition={{ rotate: { duration: 50, repeat: Infinity, ease: "linear" }, y: { duration: 9, repeat: Infinity, ease: "easeInOut" } }}
+          className="absolute"
+          style={{ top: "8%", left: "8%", width: "200px", height: "200px" }}
+        >
+          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="100,15 185,165 15,165" stroke="rgba(170,28,28,0.22)" strokeWidth="1.2" fill="none" />
+            <polygon points="100,45 160,155 40,155" stroke="rgba(170,28,28,0.13)" strokeWidth="1" fill="none" />
+            <line x1="100" y1="15" x2="100" y2="165" stroke="rgba(170,28,28,0.10)" strokeWidth="1" />
+            <line x1="15"  y1="165" x2="100" y2="90" stroke="rgba(170,28,28,0.10)" strokeWidth="1" />
+            <line x1="185" y1="165" x2="100" y2="90" stroke="rgba(170,28,28,0.10)" strokeWidth="1" />
+          </svg>
+        </motion.div>
+
+        {/* SMALL WIREFRAME CUBE — mid-left */}
+        <motion.div
+          animate={{ rotate: [0, 360] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute"
+          style={{ top: "55%", left: "5%", width: "100px", height: "100px" }}
+        >
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="15" y="15" width="50" height="50" stroke="rgba(210,40,40,0.28)" strokeWidth="1.3" />
+            <rect x="35" y="35" width="50" height="50" stroke="rgba(210,40,40,0.16)" strokeWidth="1" />
+            <line x1="15" y1="15" x2="35" y2="35" stroke="rgba(210,40,40,0.22)" strokeWidth="1" />
+            <line x1="65" y1="15" x2="85" y2="35" stroke="rgba(210,40,40,0.22)" strokeWidth="1" />
+            <line x1="15" y1="65" x2="35" y2="85" stroke="rgba(210,40,40,0.22)" strokeWidth="1" />
+            <line x1="65" y1="65" x2="85" y2="85" stroke="rgba(210,40,40,0.22)" strokeWidth="1" />
+          </svg>
+        </motion.div>
+
+        {/* HEXAGON — far right mid */}
+        <motion.div
+          animate={{ rotate: [0, 180], x: [0, 10, 0] }}
+          transition={{ rotate: { duration: 40, repeat: Infinity, ease: "linear" }, x: { duration: 11, repeat: Infinity, ease: "easeInOut" } }}
+          className="absolute"
+          style={{ top: "60%", right: "5%", width: "140px", height: "140px" }}
+        >
+          <svg viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="70,8 126,39 126,101 70,132 14,101 14,39" stroke="rgba(185,30,30,0.22)" strokeWidth="1.2" fill="none" />
+            <polygon points="70,26 108,47 108,93 70,114 32,93 32,47" stroke="rgba(185,30,30,0.12)" strokeWidth="1" fill="none" />
+            {[0,1,2,3,4,5].map(i => {
+              const a = (i * 60 - 90) * Math.PI / 180;
+              return <line key={i} x1="70" y1="70" x2={70 + 62 * Math.cos(a)} y2={70 + 62 * Math.sin(a)} stroke="rgba(185,30,30,0.09)" strokeWidth="1" />;
+            })}
+          </svg>
+        </motion.div>
+
+        {/* TINY DIAMOND — bottom center */}
+        <motion.div
+          animate={{ rotate: [0, 360], y: [0, -12, 0] }}
+          transition={{ rotate: { duration: 20, repeat: Infinity, ease: "linear" }, y: { duration: 5, repeat: Infinity, ease: "easeInOut" } }}
+          className="absolute"
+          style={{ bottom: "15%", left: "42%", width: "60px", height: "60px" }}
+        >
+          <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="30,4 56,30 30,56 4,30" stroke="rgba(220,45,45,0.40)" strokeWidth="1.5" fill="none" />
+          </svg>
+        </motion.div>
+
+        {/* LARGE RING — background center */}
+        <motion.div
+          animate={{ rotate: [0, 360] }}
+          transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
+          className="absolute"
+          style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "700px", height: "700px" }}
+        >
+          <svg viewBox="0 0 700 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="350" cy="350" r="320" stroke="rgba(150,20,20,0.07)" strokeWidth="1" strokeDasharray="8 16" />
+            <circle cx="350" cy="350" r="260" stroke="rgba(150,20,20,0.05)" strokeWidth="1" strokeDasharray="4 20" />
+          </svg>
+        </motion.div>
+      </div>
+
+      {/* WARM RED GLOW */}
+      <div
+        className="fixed z-[1] pointer-events-none"
+        style={{
+          top: "20%", right: "10%",
+          width: "500px", height: "500px",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(160,22,22,0.18) 0%, transparent 70%)",
+          filter: "blur(60px)",
+        }}
+      />
+
+      {/* VIGNETTE */}
+      <div
+        className="fixed inset-0 z-[2] pointer-events-none"
+        style={{ background: "radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(0,0,0,0.75) 100%)" }}
+      />
+
+      {/* NOISE GRAIN */}
+      <div
+        className="fixed inset-0 z-[2] pointer-events-none"
+        style={{
+          opacity: 0.04,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "repeat",
+          backgroundSize: "200px 200px",
+        }}
+      />
+
+      {/* ─────────────────── HERO IMAGE ─────────────────── */}
+      <div className="relative z-[2] w-full h-[520px] overflow-hidden">
+        <motion.img
+          initial={{ scale: 1.12, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+          src="/hero-achievements.jpg"
+          alt="Achievements Banner"
+          className="w-full h-full object-cover grayscale"
+        />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+
+        <div className="absolute inset-0 flex items-center justify-center text-center px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 35 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="text-[11px] tracking-[0.28em] text-[#ff4b4b] font-bold mb-6">
+              ACHIEVEMENTS / 03
             </div>
-          </Link>
-          <div className="flex items-center gap-6 text-sm font-medium">
-            <Link href="/about" className="hover:text-black text-[#191919]">About</Link>
-            <Link href="/projects" className="hover:text-black text-[#191919]">Projects</Link>
-            <Link href="/members" className="hover:text-black text-[#191919]">Members</Link>
-            <Link href="/achievements" className="text-[#931f1f]">Achievements</Link>
-            <Link href="/contact" className="hover:text-black text-[#191919]">Contact</Link>
-            <Link href="/contact" className="bg-[#191919] text-white text-[11px] font-semibold px-4 py-2 rounded-full hover:bg-black transition-colors">Join us</Link>
-          </div>
+            <h1 className="text-white text-[78px] leading-[0.98] font-semibold tracking-tight">
+              Building more
+              <br />
+              than projects.
+            </h1>
+            <p className="text-white/65 text-sm mt-7 max-w-[680px] mx-auto leading-relaxed">
+              Every milestone represents students learning, building, collaborating, and{" "}
+              <span className="text-[#ff4b4b] font-bold">creating real impact.</span>
+            </p>
+          </motion.div>
         </div>
-      </nav>
+      </div>
 
-      {/* CORE ADVANTAGE LAYOUT */}
-      <main className="relative pt-[220px] px-10 pb-40 text-[#191919]">
+      <Navbar />
+
+      {/* ─────────────────── MAIN CONTENT ─────────────────── */}
+      <main className="relative z-[3] px-10 py-32">
         <div className="max-w-[1400px] mx-auto">
-          <div className="text-[11px] font-mono tracking-widest text-[#931f1f] font-bold mb-6">WHY JOIN / 03</div>
-          
-          <h1 className="font-serif text-[64px] leading-[1.1] tracking-tight max-w-[900px] font-medium mb-16">
-            Skills that get you hired.
-          </h1>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12 max-w-[1200px]">
-            {benefits.map((b, i) => (
-              <div key={i} className="border-t border-gray-200 pt-6">
-                <div className="text-xs font-mono font-bold text-[#931f1f] mb-3">{b.id}</div>
-                <h3 className="text-lg font-serif font-medium text-gray-900 mb-2">{b.title}</h3>
-                <p className="text-xs text-gray-600 leading-relaxed font-medium">{b.text}</p>
-              </div>
+          {/* STATS */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-28"
+          >
+            {[
+              { num: "50+", label: "Members" },
+              { num: "3",   label: "Projects" },
+              { num: "10+", label: "Events" },
+              { num: "4",   label: "Departments" },
+            ].map((s, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ y: -6, scale: 1.02 }}
+                className="border border-white/10 bg-white/[0.03] backdrop-blur-xl rounded-3xl p-8 text-center"
+              >
+                <div className="text-[52px] font-semibold text-white mb-3">{s.num}</div>
+                <div className="text-[11px] tracking-[0.22em] uppercase text-[#ff4b4b]">{s.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* SECTION TITLE */}
+          <motion.div
+            initial={{ opacity: 0, y: 35 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-16"
+          >
+            <div className="text-[11px] tracking-[0.25em] uppercase text-[#ff4b4b] font-bold mb-5">
+              OUR MILESTONES
+            </div>
+            <h2 className="text-white text-[58px] leading-none font-semibold tracking-tight">
+              Real impact.
+              <br />
+              Real experiences.
+            </h2>
+          </motion.div>
+
+          {/* ACHIEVEMENTS GRID */}
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-10">
+            {achievements.map((a, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 45 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -10, scale: 1.02 }}
+                className="group bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-[30px] overflow-hidden"
+              >
+                <div className="relative overflow-hidden">
+                  <motion.img
+                    whileHover={{ scale: 1.06 }}
+                    transition={{ duration: 0.6 }}
+                    src={a.image}
+                    alt={a.title}
+                    className="w-full h-[250px] object-cover brightness-[0.82]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                  <div className="absolute bottom-5 left-5">
+                    <div className="text-[11px] tracking-[0.2em] text-[#ff4b4b] font-bold">{a.year}</div>
+                  </div>
+                </div>
+                <div className="p-7">
+                  <h3 className="text-[28px] text-white font-semibold mb-4 leading-tight">{a.title}</h3>
+                  <p className="text-sm text-white/65 leading-relaxed">{a.text}</p>
+                </div>
+              </motion.div>
             ))}
           </div>
 

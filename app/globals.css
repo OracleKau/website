@@ -1,15 +1,15 @@
 /* app/globals.css */
 
-/* 1. تعريف خط Banana داخل المشروع */
+/* DM Mono for eyebrows, stat labels, nav badge */
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap');
+
+/* 1. banana font declaration */
 @font-face {
   font-family: 'Banana';
   src: url('/fonts/banana.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
-
-/* DM Mono for eyebrows, stat labels, nav badge */
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -20,7 +20,6 @@
   --grid-line-color: rgba(147, 31, 31, 0.10);
   --fade-color: #931f1f;
 
-  /* درجات العنابي المفتوحة والمشرقة لصفحة About */
   --about-vibrant-base: #910404;   
   --about-super-glow: #e62222;     
 }
@@ -72,7 +71,7 @@ html:not(:has(a[href="/about"].text-\[\#c0392b\])):not(:has(a[href="/about"].tex
   opacity: 0.65;
 }
 
-/* ── ABOUT PAGE: إرجاع الشبكة الكاملة المشرقة مع التوهج الساطع في المنتصف ── */
+/* ── ABOUT PAGE ── */
 html:has(a[href="/about"].text-\[\#c0392b\]) .design-background,
 html:has(a[href="/about"].text-red-300) .design-background {
   background-color: var(--about-vibrant-base) !important;

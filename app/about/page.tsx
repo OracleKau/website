@@ -3,74 +3,87 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import Navbar from "../components/Navbar";
 import { useEffect, useRef } from "react";
 
+type Drop = {
+  x: number;
+  y: number;
+  speed: number;
+  char: string;
+  alpha: number;
+};
+
 export default function About() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const canvasEl = canvasRef.current;
+    if (!canvasEl) return;
+
+    const context = canvasEl.getContext("2d");
+    if (!context) return;
+
+    const canvas = canvasEl;
+    const ctx = context;
 
     const bits = ["0", "1"];
 
     let animId: number;
-    const colWidth = 28;
-    const fontSize = 20;
 
-    type Drop = {
-      x: number;
-      y: number;
-      speed: number;
-      char: string;
-      alpha: number;
-    };
+    const colWidth = 36;
+    const fontSize = 32;
 
     let drops: Drop[] = [];
 
     function makeDrop(x: number): Drop {
       return {
         x,
-        y: Math.random() * -300,
-        speed: 0.35 + Math.random() * 0.30,   // moderate pace
+        y: Math.random() * -500,
+        speed: 1 + Math.random() * 0.9,
         char: bits[Math.floor(Math.random() * bits.length)],
-        alpha: 0.50 + Math.random() * 0.45,
+        alpha: 0.75 + Math.random() * 0.25,
       };
     }
 
     function init() {
-      canvas!.width  = canvas!.offsetWidth;
-      canvas!.height = canvas!.offsetHeight;
-      // Only populate the right 55% of the screen
-      const startX = Math.floor(canvas!.width * 0.45);
-      const cols   = Math.floor((canvas!.width - startX) / colWidth);
-      drops = Array.from({ length: cols }, (_, i) => makeDrop(startX + i * colWidth));
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const startX = canvas.width * 0.42;
+      const cols = Math.floor((canvas.width - startX) / colWidth);
+
+      drops = Array.from({ length: cols }, (_, i) =>
+        makeDrop(startX + i * colWidth)
+      );
     }
 
     function draw() {
-      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
-      ctx!.font = `400 ${fontSize}px 'Banana', sans-serif`;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Fade mask: transparent on left edge of rain zone, opaque on right
-      const fadeStart = canvas!.width * 0.45;
-      const fadeEnd   = canvas!.width * 0.62;
+      ctx.font = `500 ${fontSize}px monospace`;
+
+      const fadeStart = canvas.width * 0.42;
+      const fadeEnd = canvas.width * 0.65;
 
       for (const d of drops) {
-        // Calculate fade factor — 0 at fadeStart, 1 at fadeEnd
-        const fade = Math.min(1, Math.max(0, (d.x - fadeStart) / (fadeEnd - fadeStart)));
-        const fadedAlpha = d.alpha * fade * 0.55; // also reduce overall opacity
-        ctx!.fillStyle = `rgba(80, 5, 5, ${fadedAlpha})`;
-        ctx!.fillText(d.char, d.x, d.y);
+        const fadeFactor = Math.min(
+          1,
+          Math.max(0, (d.x - fadeStart) / (fadeEnd - fadeStart))
+        );
+
+        const finalAlpha = d.alpha * fadeFactor * 0.22;
+
+        ctx.fillStyle = `rgba(255, 45, 45, ${finalAlpha})`;
+        ctx.fillText(d.char, d.x, d.y);
 
         d.y += d.speed;
 
-        if (d.y > canvas!.height + fontSize) {
+        if (d.y > canvas.height + fontSize) {
           const fresh = makeDrop(d.x);
-          d.y     = fresh.y;
+          d.y = fresh.y;
           d.speed = fresh.speed;
-          d.char  = fresh.char;
+          d.char = fresh.char;
           d.alpha = fresh.alpha;
         }
       }
@@ -78,160 +91,126 @@ export default function About() {
       animId = requestAnimationFrame(draw);
     }
 
+    const handleResize = () => init();
+
     init();
     draw();
 
-    window.addEventListener("resize", init);
+    window.addEventListener("resize", handleResize);
+
     return () => {
       cancelAnimationFrame(animId);
-      window.removeEventListener("resize", init);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   return (
     <>
-      <canvas
-        ref={canvasRef}
-        className="fixed inset-0 w-full h-full z-[-5] pointer-events-none opacity-80"
-      />
-
-      <div className="design-background" />
-
-      {/* ── Navbar ── */}
-      <motion.nav
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 left-0 w-full z-50 px-10 py-6 text-[#191919] bg-[#FCF8F5]/40 backdrop-blur-md border-b border-[#931f1f]/5"
+      {/* ───────────────── BACKGROUND ───────────────── */}
+      <div
+        className="fixed inset-0 -z-10 overflow-hidden"
+        style={{ background: "linear-gradient(160deg, #0a0505 0%, #150a0a 50%, #200c0c 100%)" }}
       >
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between">
+        {/* Noise Texture */}
+        <div
+          className="absolute inset-0 z-10 pointer-events-none"
+          style={{
+            opacity: 0.05,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+            backgroundSize: "200px 200px",
+          }}
+        />
 
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <motion.img
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.7, ease: "easeInOut" }}
-              src="/logo.png"
-              alt="Oracle Club Logo"
-              className="w-8 h-8 object-contain rounded cursor-pointer"
-            />
-            <div className="flex flex-col">
-              <span className="font-bold text-sm leading-none text-[#191919]">Oracle Club</span>
-              <span className="text-[9px] text-[#931f1f] font-semibold tracking-widest uppercase mt-0.5">KAU · JEDDAH</span>
-            </div>
-          </Link>
+        {/* Fading Grid */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)",
+            backgroundSize: "70px 70px",
+            maskImage: "radial-gradient(ellipse 80% 60% at 50% 40%, #000 60%, transparent 100%)",
+            WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 40%, #000 60%, transparent 100%)",
+          }}
+        />
 
-          <div className="flex items-center gap-6 text-sm font-medium">
-            <div className="bg-[#931f1f]/10 text-[#931f1f] text-[11px] px-3 py-1 rounded-full font-semibold border border-[#931f1f]/20 flex items-center gap-1.5 select-none">
-              <span className="w-1 h-1 rounded-full bg-[#931f1f] animate-pulse"></span>
-              Next event in 3 days
-            </div>
+        {/* Gradient Orbs */}
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15], rotate: [0, 90, 0] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute right-[-10%] top-[-10%] h-[900px] w-[900px] rounded-full bg-[#8b2323] blur-[160px]"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.2, 0.1], x: [0, -60, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-10%] right-[20%] h-[700px] w-[700px] rounded-full bg-[#4d1616] blur-[140px]"
+        />
+      </div>
 
-            <Link href="/about"        className="relative nav-link-underline text-[#931f1f] font-bold">About</Link>
-            <Link href="/projects"     className="relative nav-link-underline text-[#191919]">Projects</Link>
-            <Link href="/members"      className="relative nav-link-underline text-[#191919]">Members</Link>
-            <Link href="/events"       className="relative nav-link-underline text-[#191919]">Events</Link>
-            <Link href="/sponsors"     className="relative nav-link-underline text-[#191919]">Sponsors</Link>
+      {/* MATRIX RAIN */}
+      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[1]" />
 
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/contact" className="bg-[#191919] text-white text-[11px] font-semibold px-4 py-2 rounded-full flex items-center gap-1 hover:bg-black transition-colors">
-                Join us <span className="text-[9px] translate-y-[0.5px]">→</span>
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-      </motion.nav>
+      <Navbar />
 
-      {/* ── Main Layout ── */}
-      <main className="relative min-h-screen pt-[80px] z-10 flex flex-col justify-center">
-        <div className="max-w-[1400px] mx-auto w-full px-10 py-16 grid grid-cols-[1fr_1px_0.6fr] gap-0 items-center">
+      {/* ───────────────── MAIN ───────────────── */}
+      <main className="relative z-[3] min-h-screen pt-[120px] flex flex-col justify-center">
+        <div className="max-w-[1400px] mx-auto w-full px-6 py-16 md:px-10 flex flex-col lg:grid lg:grid-cols-[1fr_1px_0.6fr] gap-16 lg:gap-0 items-center">
 
-          {/* LEFT */}
+          {/* LEFT: TEXT */}
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-            className="pr-16"
+            transition={{ delay: 0.15, duration: 0.75 }}
+            className="w-full lg:pr-20"
           >
-            <div className="flex items-center gap-3 mb-7">
-              <div className="w-7 h-[1.5px]" style={{ backgroundColor: "#2a0000" }} />
-              <span className="font-banana text-[10px] font-normal tracking-[0.14em] uppercase" style={{ color: "#2a0000" }}>
-                About / 01
+            <h1 className="font-black leading-[1.1] tracking-tight text-white mb-8">
+              <span className="block text-[32px] sm:text-[56px] lg:text-[72px]">
+                More than a <span className="text-[#ff4b4b]">Study Group</span>.
               </span>
-            </div>
-
-            <h1
-              className="font-banana text-[56px] sm:text-[72px] leading-[1.07] tracking-tight mb-7"
-              style={{ color: "#0d0000" }}
-            >
-              More than a{" "}
-              <em className="not-italic italic font-medium" style={{ color: "#1a0000" }}>
-                study group
-              </em>
-              .<br />
-              We{"'"}re an engineering team.
+              <span className="block text-[32px] sm:text-[56px] lg:text-[72px] mt-2 sm:mt-0">
+                We Learn. We Build. We Lead.
+              </span>
             </h1>
 
-            <div
-              className="space-y-5 max-w-[540px] font-banana text-[15px] leading-[1.80] font-normal"
-              style={{ color: "#1e0202" }}
-            >
-              <p>
-                Most CS students graduate having never shipped a real product. They{"'"}ve done
-                assignments, taken exams, watched tutorials. Then they apply for jobs and realize
-                the gap between school and industry.
+            <div className="space-y-6 text-white/70 text-[16px] sm:text-[17px] leading-[1.8] max-w-[580px] font-medium">
+              <p className="hover:text-white transition-colors duration-300">
+                Most students study tech without building real systems. This club changes that by focusing on rigorous, real-world engineering experience.
               </p>
-              <p>
-                We exist to close that gap. Oracle Student Club operates like a real software
-                company — sprints, pull requests, code reviews, deployed products with real users.
-                Members leave with portfolios, certifications, and references that get them hired.
+              <p className="hover:text-white transition-colors duration-300">
+                Members collaborate closely on projects, participate in fast-paced hackathons, and build complete products that simulate modern industry environments.
               </p>
-              <p>
-                Founded in 2026 at KAU Jeddah, we{"'"}re tech-forward, project-driven, and welcoming
-                to anyone with curiosity — whether you{"'"}re a senior CS student or just learning
-                your first language.
+              <p className="hover:text-white transition-colors duration-300">
+                Founded at KAU Jeddah in 2026, we bring together ambitious students who want to push boundaries and grow far beyond traditional classroom learning.
               </p>
             </div>
           </motion.div>
 
-          {/* Vertical divider */}
-          <div className="self-stretch" style={{ backgroundColor: "rgba(0,0,0,0.2)" }} />
+          {/* VERTICAL DIVIDER */}
+          <div className="hidden lg:block self-stretch bg-gradient-to-b from-transparent via-white/10 to-transparent w-[1px]" />
 
-          {/* RIGHT: stats */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3, duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-            className="pl-16 flex flex-col justify-center"
-          >
+          {/* RIGHT: STATS */}
+          <div className="w-full lg:pl-20 grid grid-cols-3 lg:grid-cols-1 gap-8 lg:gap-0">
             {[
-              { num: "50+", label: "Active\nMembers" },
-              { num: "3",   label: "Live\nProjects" },
-              { num: "4",   label: "Cross-Functional\nDepartments" },
-            ].map(({ num, label }, i) => (
-              <div
+              { num: "70+", label: "Active\nMembers" },
+              { num: "3+",  label: "Live\nProjects" },
+              { num: "4",   label: "Departments" },
+            ].map((item, i) => (
+              <motion.div
                 key={i}
-                className="grid grid-cols-[1fr_auto] items-center py-6 px-4 rounded-xl transition-colors"
-                style={{
-                  borderTop: i === 0 ? "0.5px solid rgba(0,0,0,0.18)" : undefined,
-                  borderBottom: "0.5px solid rgba(0,0,0,0.18)",
-                }}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 + i * 0.1, duration: 0.6 }}
+                className="lg:py-8 lg:border-b border-white/10 last:border-0 group cursor-default"
               >
-                <span
-                  className="font-banana text-[56px] leading-none tracking-tight"
-                  style={{ color: "#0d0000" }}
-                >
-                  {num}
-                </span>
-                <span
-                  className="font-banana text-[9px] font-semibold tracking-[0.13em] uppercase text-right leading-[1.6] whitespace-pre-line"
-                  style={{ color: "#2a0000" }}
-                >
-                  {label}
-                </span>
-              </div>
+                <div className="text-white text-[40px] sm:text-[56px] font-black leading-none group-hover:scale-105 group-hover:text-[#ffb3b3] transition-all origin-left">
+                  {item.num}
+                </div>
+                <div className="text-[#f4dede]/60 text-[10px] font-bold uppercase tracking-[0.25em] whitespace-pre-line mt-3 group-hover:text-white transition-colors">
+                  {item.label}
+                </div>
+              </motion.div>
             ))}
-          </motion.div>
-
+          </div>
         </div>
       </main>
     </>
