@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 /* ─────────────────── DATA ─────────────────── */
 
@@ -87,13 +87,7 @@ const ways = [
   },
 ];
 
-// ── Add logo filenames here. Place the actual files in /public/logos/ ──
-const currentSponsors = [
-  { name: "COCOON TREE", tier: "Workshop Host", logo: "/logos/cocoon-tree.png" },
-  { name: "WADI JEDDAH", tier: "Workshop Host", logo: "/logos/Wadi-Jeddah.png" },
-  { name: "ALMAQAM CAFE", tier: "Event Host", logo: "/logos/almaqam-cafe.png" },
-  { name: "Innovation Hub", tier: "Tools Partner", logo: "/logos/innovation-hub.png" },
-];
+// Sponsors are fetched dynamically from the database.
 
 /* ─────────────────── BACKGROUND ─────────────────── */
 
@@ -167,10 +161,66 @@ function SponsorLogo({ name, logo }: { name: string; logo: string }) {
 export default function Sponsors() {
   const [form, setForm] = useState({ name: "", org: "", email: "", kind: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentSponsors, setCurrentSponsors] = useState<any[]>([]);
+  const [cfToken, setCfToken] = useState<string | null>(null);
 
-  function handleSend() {
-    if (!form.name.trim() || !form.email.trim()) return;
-    setSent(true);
+  useEffect(() => {
+    // Register global callback for Turnstile
+    (window as any).onTurnstileSuccess = (token: string) => {
+      setCfToken(token);
+    };
+
+    // Load Turnstile script dynamically
+    if (!document.querySelector('script[src*="turnstile/v0/api.js"]')) {
+      const script = document.createElement("script");
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    }
+
+    // Load sponsors from DB
+    fetch("/api/sponsors")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCurrentSponsors(
+            data.map((s) => ({
+              ...s,
+              logo: s.logoUrl,
+            }))
+          );
+        }
+      })
+      .catch((err) => console.error("Error fetching sponsors:", err));
+
+    return () => {
+      delete (window as any).onTurnstileSuccess;
+    };
+  }, []);
+
+  async function handleSend() {
+    if (!form.name.trim() || !form.email.trim() || !cfToken || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/submit-contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, cfToken }),
+      });
+      if (res.ok) {
+        setSent(true);
+      } else {
+        const errData = await res.json();
+        alert(errData.error || "Failed to submit. Please try again.");
+      }
+    } catch (err) {
+      console.error("Submit error:", err);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -625,16 +675,26 @@ export default function Sponsors() {
                     />
                   </div>
 
+                  {/* Cloudflare Turnstile Spam Protection */}
+                  <div className="flex flex-col gap-2 my-2 align-middle justify-center items-center">
+                    <div
+                      className="cf-turnstile"
+                      data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA"}
+                      data-callback="onTurnstileSuccess"
+                      data-theme="dark"
+                    ></div>
+                  </div>
+
                   <button
                     type="button"
                     onClick={handleSend}
-                    disabled={!form.name.trim() || !form.email.trim()}
-                    className="text-white font-semibold text-sm py-3.5 rounded-full transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                    disabled={!form.name.trim() || !form.email.trim() || !cfToken || isSubmitting}
+                    className="text-white font-semibold text-sm py-3.5 rounded-full transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                     style={{ background: "#ff3d3d" }}
                     onMouseEnter={e => { if (!(e.currentTarget as HTMLButtonElement).disabled) (e.currentTarget as HTMLElement).style.background = "#e02d2d"; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#ff3d3d"; }}
                   >
-                    Send message →
+                    {isSubmitting ? "Sending..." : "Send message →"}
                   </button>
 
                   <p className="text-center text-white/20 text-[10px]">

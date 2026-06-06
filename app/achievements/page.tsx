@@ -1,43 +1,28 @@
-// app/achievements/page.tsx
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 
 export default function Achievements() {
-  const achievements = [
-    {
-      image: "/achievements/engineering-day.jpg",
-      year: "2026",
-      title: "Engineering Day Participation",
-      text: "Participated in Engineering Day through an interactive booth that introduced students and visitors to Oracle Club's vision, activities, and community impact.",
-    },
-    {
-      image: "/achievements/workshop.jpg",
-      year: "2026",
-      title: "Oracle 'My Future' Initiative",
-      text: "A professional development and career growth initiative by Oracle that empowers participants to strengthen technical skills and earn industry-recognized qualifications.",
-    },
-    {
-      image: "/achievements/techhub.jpg",
-      year: "2026",
-      title: "TechHub Participation",
-      text: "Participated in TechHub at King Abdulaziz University, engaging with workshops, tech sessions, and innovation activities that strengthen digital skills and industry readiness.",
-    },
-    {
-      image: "/achievements/cloud-workshop.jpg",
-      year: "2026",
-      title: "Cloud Computing Workshop",
-      text: "A hands-on workshop led by Rayan AlYasi introducing core cloud computing concepts and practical applications in modern development.",
-    },
-    {
-      image: "/achievements/certifications.jpg",
-      year: "2026",
-      title: "The Unseen Forces of Interaction",
-      text: "An insightful technical session delivered by Joud AlRimi exploring interaction systems and the hidden mechanisms behind user experience design.",
-    },
-  ];
+  const [achievements, setAchievements] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/achievements")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setAchievements(
+            data.map((item) => ({
+              ...item,
+              image: item.imageUrl,
+            }))
+          );
+        }
+      })
+      .catch((err) => console.error("Error fetching achievements:", err));
+  }, []);
 
   return (
     <>

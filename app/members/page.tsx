@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // ─── Social Platform Icons ────────────────────────────────────────────────────
 
@@ -79,248 +79,64 @@ const SocialLinks = ({ social }: { social?: Social }) => {
 // ─── Page Component ───────────────────────────────────────────────────────────
 
 export default function Members() {
+  const [members, setMembers] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/members")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setMembers(data);
+      })
+      .catch((err) => console.error("Error fetching members:", err));
+  }, []);
+
+  const mappedMembers = members.map((m) => ({
+    ...m,
+    social: {
+      linkedin: m.linkedin || undefined,
+      github: m.github || undefined,
+      x: m.twitter || undefined,
+      email: m.email || undefined,
+    },
+  }));
+
   const leadership = {
-    presidents: [
-      {
-        initials: "AK",
-        role: "PRESIDENT FOUNDER",
-        name: "Ammar Koshak",
-        academic: "Computer Science Senior",
-        quote: "Started the club because we needed somewhere to actually build things instead of just learning about them.",
-        social: {
-          linkedin: "https://linkedin.com/in/ammarkoshak",
-          email: "ammar.koshak@kau.edu.sa",
-          github: "https://github.com/ammarkoshak",
-          x: "https://x.com/ammarkoshak",
-        },
-      },
-      {
-        initials: "JA",
-        role: "PRESIDENT FOUNDER",
-        name: "Joud Alaskar",
-        academic: "Computer Science Junior",
-        quote: "If you cannot deploy it, it does not exist.",
-        social: {
-          linkedin: "https://linkedin.com/in/joudalaskar",
-          email: "joud.alaskar@kau.edu.sa",
-          github: "https://github.com/joudalaskar",
-          x: "https://x.com/joudalaskar",
-        },
-      },
-    ],
-    heads: [
-      // Tech
-      {
-        initials: "YS",
-        role: "LEADER - TECH",
-        name: "Yousef Al-Saud",
-        academic: "Computer Science Senior",
-        quote: "Code that ships beats code that is perfect.",
-        social: {
-          linkedin: "https://linkedin.com/in/yousefsaud",
-          github: "https://github.com/yousefsaud",
-          x: "https://x.com/yousef_saud",
-        },
-      },
-      {
-        initials: "AS",
-        role: "VICE-LEADER - TECH",
-        name: "Ali Al-Shahrani",
-        academic: "Software Engineering Junior",
-        quote: "Every bug is just a feature in disguise.",
-        social: {
-          linkedin: "https://linkedin.com/in/alishahrani",
-          email: "ali.shahrani@kau.edu.sa",
-          github: "https://github.com/alishahrani",
-        },
-      },
-      // Media
-      {
-        initials: "SM",
-        role: "LEADER - MEDIA",
-        name: "Sara Mohammed",
-        academic: "Design & Communications",
-        quote: "Great work needs a great story behind it.",
-        social: {
-          linkedin: "https://linkedin.com/in/saramohammed",
-          email: "sara.mohammed@kau.edu.sa",
-          x: "https://x.com/sara_mohammed",
-        },
-      },
-      {
-        initials: "BZ",
-        role: "VICE-LEADER - MEDIA",
-        name: "Bader Al-Zahrani",
-        academic: "Design Senior",
-        quote: "Visuals speak before words ever do.",
-        social: {
-          linkedin: "https://linkedin.com/in/baderzahrani",
-          x: "https://x.com/bader_zahrani",
-        },
-      },
-      // Human Resources
-      {
-        initials: "FA",
-        role: "LEADER - HR",
-        name: "Fatima Al-Harbi",
-        academic: "Business Administration",
-        quote: "People first. Always.",
-        social: {
-          linkedin: "https://linkedin.com/in/fatimaharbi",
-          email: "fatima.harbi@kau.edu.sa",
-        },
-      },
-      {
-        initials: "AA",
-        role: "VICE-LEADER - HR",
-        name: "Arwa Al-Assiri",
-        academic: "Business Administration Junior",
-        quote: "Culture is not built overnight, it is built every day.",
-        social: {
-          linkedin: "https://linkedin.com/in/arwaassiri",
-          email: "arwa.assiri@kau.edu.sa",
-          x: "https://x.com/arwa_assiri",
-        },
-      },
-      // Public Relations
-      {
-        initials: "NQ",
-        role: "LEADER - PR",
-        name: "Noor Al-Qahtani",
-        academic: "Marketing Junior",
-        quote: "Every sponsor is a relationship, not a transaction.",
-        social: {
-          linkedin: "https://linkedin.com/in/noorqahtani",
-          email: "noor.qahtani@kau.edu.sa",
-          x: "https://x.com/noor_qahtani",
-        },
-      },
-      {
-        initials: "DA",
-        role: "VICE-LEADER - PR",
-        name: "Danah Al-Anazi",
-        academic: "Communications Junior",
-        quote: "Your brand is what people say when you are not in the room.",
-        social: {
-          linkedin: "https://linkedin.com/in/danahanazi",
-          x: "https://x.com/danah_anazi",
-        },
-      },
-    ],
+    presidents: mappedMembers
+      .filter((m) => m.isLeadership && m.department === "presidency")
+      .sort((a, b) => a.order - b.order),
+    heads: mappedMembers
+      .filter((m) => m.isLeadership && m.department !== "presidency")
+      .sort((a, b) => a.order - b.order),
   };
 
   const departments = [
     {
       id: "tech",
       label: "Tech",
-      members: [
-        {
-          initials: "KM",
-          name: "Khalid Mansour",
-          academic: "Software Engineering Sophomore",
-          social: { linkedin: "https://linkedin.com/in/khalidmansour", github: "https://github.com/khalidmansour" },
-        },
-        {
-          initials: "RM",
-          name: "Reem Al-Mutairi",
-          academic: "Computer Science Junior",
-          social: { linkedin: "https://linkedin.com/in/reemmutairi", github: "https://github.com/reemmutairi" },
-        },
-        {
-          initials: "HB",
-          name: "Hamad Al-Balawi",
-          academic: "Information Systems Senior",
-          social: {
-            linkedin: "https://linkedin.com/in/hamadbalawi",
-            github: "https://github.com/hamadbalawi",
-            x: "https://x.com/hamad_balawi",
-          },
-        },
-        {
-          initials: "LO",
-          name: "Lama Al-Otaibi",
-          academic: "Computer Science Sophomore",
-          social: { linkedin: "https://linkedin.com/in/lamaotaibi", github: "https://github.com/lamaotaibi" },
-        },
-      ],
+      members: mappedMembers
+        .filter((m) => !m.isLeadership && m.department === "tech")
+        .sort((a, b) => a.order - b.order),
     },
     {
       id: "pr",
       label: "Public Relations",
-      members: [
-        {
-          initials: "FG",
-          name: "Faisal Al-Ghamdi",
-          academic: "Marketing Senior",
-          social: { linkedin: "https://linkedin.com/in/faisalghamdi", email: "faisal.ghamdi@kau.edu.sa" },
-        },
-        {
-          initials: "NA",
-          name: "Nada Al-Ahmadi",
-          academic: "Public Relations Sophomore",
-          social: { linkedin: "https://linkedin.com/in/nadaahmadi", x: "https://x.com/nada_ahmadi" },
-        },
-        {
-          initials: "WS",
-          name: "Waleed Al-Subaie",
-          academic: "Business Administration Junior",
-          social: { linkedin: "https://linkedin.com/in/waleedsubaie", email: "waleed.subaie@kau.edu.sa" },
-        },
-      ],
+      members: mappedMembers
+        .filter((m) => !m.isLeadership && m.department === "pr")
+        .sort((a, b) => a.order - b.order),
     },
     {
       id: "media",
       label: "Media",
-      members: [
-        {
-          initials: "SA",
-          name: "Shahad Al-Aqeel",
-          academic: "Visual Arts Junior",
-          social: { linkedin: "https://linkedin.com/in/shahadaqeel", x: "https://x.com/shahad_aqeel" },
-        },
-        {
-          initials: "MH",
-          name: "Mona Al-Harbi",
-          academic: "Graphic Design Sophomore",
-          social: { linkedin: "https://linkedin.com/in/monaharbi", email: "mona.harbi@kau.edu.sa" },
-        },
-        {
-          initials: "TK",
-          name: "Tariq Al-Khaldi",
-          academic: "Media Production Junior",
-          social: { linkedin: "https://linkedin.com/in/tariqkhaldi", github: "https://github.com/tariqkhaldi" },
-        },
-        {
-          initials: "RN",
-          name: "Rana Al-Nasser",
-          academic: "Design Senior",
-          social: { linkedin: "https://linkedin.com/in/rananasser", x: "https://x.com/rana_nasser" },
-        },
-      ],
+      members: mappedMembers
+        .filter((m) => !m.isLeadership && m.department === "media")
+        .sort((a, b) => a.order - b.order),
     },
     {
       id: "hr",
       label: "Human Resources",
-      members: [
-        {
-          initials: "JM",
-          name: "Joud Al-Malki",
-          academic: "Human Resources Sophomore",
-          social: { linkedin: "https://linkedin.com/in/joudmalki", email: "joud.malki@kau.edu.sa" },
-        },
-        {
-          initials: "SK",
-          name: "Saud Al-Kahtani",
-          academic: "Management Senior",
-          social: { linkedin: "https://linkedin.com/in/saudkahtani", x: "https://x.com/saud_kahtani" },
-        },
-        {
-          initials: "HQ",
-          name: "Hessa Al-Qahtani",
-          academic: "Business Administration Junior",
-          social: { linkedin: "https://linkedin.com/in/hessaqahtani", email: "hessa.qahtani@kau.edu.sa" },
-        },
-      ],
+      members: mappedMembers
+        .filter((m) => !m.isLeadership && m.department === "hr")
+        .sort((a, b) => a.order - b.order),
     },
   ];
 
@@ -330,12 +146,15 @@ export default function Members() {
   const cardClass =
     "bg-white/[0.04] backdrop-blur-xl p-6 rounded-3xl border border-white/10 flex flex-col justify-between min-h-[240px] transition-all";
 
-  const headPairs = [
-    { dept: "Tech",  pair: [leadership.heads[0], leadership.heads[1]] },
-    { dept: "Media", pair: [leadership.heads[2], leadership.heads[3]] },
-    { dept: "HR",    pair: [leadership.heads[4], leadership.heads[5]] },
-    { dept: "PR",    pair: [leadership.heads[6], leadership.heads[7]] },
-  ];
+  const headPairs =
+    leadership.heads.length >= 8
+      ? [
+          { dept: "Tech", pair: [leadership.heads[0], leadership.heads[1]] },
+          { dept: "Media", pair: [leadership.heads[2], leadership.heads[3]] },
+          { dept: "HR", pair: [leadership.heads[4], leadership.heads[5]] },
+          { dept: "PR", pair: [leadership.heads[6], leadership.heads[7]] },
+        ]
+      : [];
 
   return (
     <>

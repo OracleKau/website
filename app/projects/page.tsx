@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 
 type TeamMember = {
@@ -31,77 +31,6 @@ type Project = {
   year: string;
 };
 
-const PROJECTS: Project[] = [
-  {
-    id: "website",
-    num: "01",
-    category: "Web Platform",
-    status: "PUBLIC LIVE",
-    name: "Oracle Club Website",
-    desc: "The official web platform for Oracle Club. Designed to showcase our student achievements, facilitate department operations, manage upcoming events, and provide a convincing pitch to attract club sponsors and partners.",
-    capabilities: [
-      { title: "Student Showcases", desc: "Highlight members, achievements, and club history." },
-      { title: "Sponsor Pitch Deck", desc: "A clean, premium presentation to pitch partners and sponsors." },
-      { title: "Seamless Navigation", desc: "Smooth fade-in transitions across all routes." },
-      { title: "Event Feeds", desc: "A clean interface for upcoming club activities." },
-    ],
-    technologies: ["Next.js", "React", "TypeScript", "TailwindCSS"],
-    team: [
-      { initials: "IA", name: "Ibrahim Albassam (PM)", role: "" },
-      { initials: "RA", name: "Refal Alhamdi", role: "" },
-      { initials: "RA", name: "Rania Almutairi", role: "" },
-      { initials: "RA", name: "Remass Ashmawi", role: "" },
-    ],
-    github: "https://github.com/daniaalshehri1/oracle-club-website",
-    year: "2024",
-  },
-  {
-    id: "operations-hub",
-    num: "02",
-    category: "Internal Tool",
-    status: "INTERNAL TOOL",
-    name: "Club Operations Hub",
-    desc: "Email sender, certificate generator, and AI-powered analytics — all in one internal platform built for our operations team.",
-    capabilities: [
-      { title: "Bulk Email", desc: "Send club communications from one place." },
-      { title: "Certificate Generator", desc: "Produce certificates for events and workshops." },
-      { title: "AI Analytics", desc: "Surface patterns in club activity data." },
-      { title: "Unified Dashboard", desc: "Operations workflows in a single internal tool." },
-    ],
-    technologies: ["React", "Python", "FastAPI", "AI"],
-    team: [
-      { initials: "AI", name: "Anas Ibrahimi (PM)", role: "" },
-      { initials: "SA", name: "Sohaib Aloudi", role: "" },
-      { initials: "KB", name: "Khadijah Baothman", role: "" },
-      { initials: "AA", name: "Abdulelah Alshareef", role: "" },
-    ],
-    year: "2026",
-  },
-  {
-    id: "event-platform",
-    num: "03",
-    category: "Campus Platform",
-    status: "FLAGSHIP",
-    name: "KAU Event Platform",
-    desc: "A free event management platform for every KAU club. QR check-ins, auto-generated certificates, real-time analytics.",
-    capabilities: [
-      { title: "Event Management", desc: "Create and manage club events end to end." },
-      { title: "QR Check-ins", desc: "Fast attendee verification at the door." },
-      { title: "Auto Certificates", desc: "Certificates generated on completion." },
-      { title: "Live Analytics", desc: "Real-time attendance and engagement data." },
-    ],
-    technologies: ["Next.js", "Oracle DB", "QR", "WebSockets"],
-    team: [
-      { initials: "JA", name: "Jana Alshaikh (PM)", role: "" },
-      { initials: "WA", name: "Waleed Alsolami", role: "" },
-      { initials: "NA", name: "Nawaf Alghamdi", role: "" },
-      { initials: "JB", name: "Joud Balkhair", role: "" },
-    ],
-    github: "https://github.com/OracleKau/kau-events",
-    year: "2026",
-  },
-];
-
 const panelVariants = {
   initial: { opacity: 0, y: 16, filter: "blur(4px)" },
   animate: { opacity: 1, y: 0, filter: "blur(0px)" },
@@ -115,8 +44,37 @@ const GitHubIcon = () => (
 );
 
 export default function Projects() {
-  const [activeId, setActiveId] = useState(PROJECTS[0].id);
-  const active = PROJECTS.find((p) => p.id === activeId) ?? PROJECTS[0];
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/projects")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const parsed = data.map((p) => {
+            try {
+              return {
+                ...p,
+                capabilities: typeof p.capabilities === "string" ? JSON.parse(p.capabilities) : p.capabilities,
+                technologies: typeof p.technologies === "string" ? JSON.parse(p.technologies) : p.technologies,
+                team: typeof p.team === "string" ? JSON.parse(p.team) : p.team,
+              };
+            } catch (err) {
+              console.error("Error parsing project fields for " + p.name, err);
+              return p;
+            }
+          });
+          setProjects(parsed);
+          if (parsed.length > 0) {
+            setActiveId(parsed[0].id);
+          }
+        }
+      })
+      .catch((err) => console.error("Error fetching projects:", err));
+  }, []);
+
+  const active = projects.find((p) => p.id === activeId) ?? projects[0];
 
   return (
     <>
@@ -268,7 +226,7 @@ export default function Projects() {
                 Select Project
               </div>
 
-              {PROJECTS.map((project) => {
+              {projects.map((project) => {
                 const isActive = project.id === activeId;
                 return (
                   <motion.button
@@ -332,168 +290,173 @@ export default function Projects() {
 
             {/* DETAIL PANEL */}
             <div className="min-h-[640px]">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={active.id}
-                  variants={panelVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
-                  className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-[32px] overflow-hidden"
-                >
-                  {/* Panel header */}
-                  <div
-                    className="relative px-10 pt-10 pb-8 border-b border-white/[0.06]"
-                    style={{ background: "linear-gradient(135deg, rgba(147,31,31,0.14), rgba(0,0,0,0.2))" }}
+              {active ? (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={active.id}
+                    variants={panelVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+                    className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-[32px] overflow-hidden"
                   >
-                    <div className="absolute -bottom-4 -right-2 text-[140px] font-bold text-white/[0.025] leading-none select-none pointer-events-none">
-                      {active.num}
-                    </div>
-
-                    <div className="relative z-10 flex flex-wrap items-center gap-3 mb-6">
-                      <span className="text-[9px] tracking-[0.2em] text-[#ff4b4b] font-bold uppercase bg-[#ff4b4b]/10 px-3 py-1.5 rounded-full border border-[#ff4b4b]/20">
-                        {active.category}
-                      </span>
-                      <span className="text-[9px] tracking-[0.2em] text-white/45 font-bold uppercase bg-white/[0.04] px-3 py-1.5 rounded-full border border-white/10">
-                        {active.status}
-                      </span>
-                      <div className="flex items-center gap-4 ml-auto">
-                        <span className="text-[10px] text-white/25 font-mono">{active.year}</span>
-                        {active.github && (
-                          <motion.a
-                            href={active.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-wider uppercase px-3 py-1.5 rounded-xl border border-[#ff4b4b]/30 text-[#ff4b4b] bg-[#ff4b4b]/5 hover:bg-[#ff4b4b]/10 hover:border-[#ff4b4b]/50 transition-colors"
-                          >
-                            <GitHubIcon />
-                            GitHub
-                          </motion.a>
-                        )}
-                      </div>
-                    </div>
-
-                    <h3 className="relative z-10 text-[42px] text-white font-semibold tracking-tight leading-[1.05] mb-4">
-                      {active.name}
-                    </h3>
-                    <p className="relative z-10 text-[15px] text-white/60 leading-relaxed max-w-[680px]">
-                      {active.desc}
-                    </p>
-                  </div>
-
-                  <div className="px-10 py-10 space-y-12">
-
-                    {/* Capabilities */}
-                    <section>
-                      <div className="flex items-center gap-4 mb-7">
-                        <h4 className="text-[10px] tracking-[0.24em] uppercase text-[#ff4b4b] font-bold">
-                          Capabilities
-                        </h4>
-                        <div className="flex-1 h-px bg-white/[0.06]" />
+                    {/* Panel header */}
+                    <div
+                      className="relative px-10 pt-10 pb-8 border-b border-white/[0.06]"
+                      style={{ background: "linear-gradient(135deg, rgba(147,31,31,0.14), rgba(0,0,0,0.2))" }}
+                    >
+                      <div className="absolute -bottom-4 -right-2 text-[140px] font-bold text-white/[0.025] leading-none select-none pointer-events-none">
+                        {active.num}
                       </div>
 
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        {active.capabilities.map((cap, i) => (
-                          <motion.div
-                            key={cap.title}
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                            whileHover={{ y: -4, borderColor: "rgba(255,75,75,0.25)" }}
-                            className="group rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 transition-colors duration-300"
-                          >
-                            <div className="flex items-start gap-3.5">
-                              <div className="mt-0.5 w-6 h-6 rounded-lg bg-[#ff4b4b]/10 border border-[#ff4b4b]/20 flex items-center justify-center text-[10px] font-mono font-bold text-[#ff4b4b] shrink-0 group-hover:bg-[#ff4b4b]/20 transition-colors">
-                                {String(i + 1).padStart(2, "0")}
-                              </div>
-                              <div>
-                                <h5 className="text-sm font-semibold text-white mb-1.5">{cap.title}</h5>
-                                <p className="text-[13px] text-white/45 leading-relaxed">{cap.desc}</p>
-                              </div>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </section>
-
-                    {/* Technologies */}
-                    <section>
-                      <div className="flex items-center gap-4 mb-7">
-                        <h4 className="text-[10px] tracking-[0.24em] uppercase text-[#ff4b4b] font-bold">
-                          Technologies
-                        </h4>
-                        <div className="flex-1 h-px bg-white/[0.06]" />
-                      </div>
-
-                      <div className="flex flex-wrap gap-2.5">
-                        {active.technologies.map((tech, i) => (
-                          <motion.span
-                            key={tech}
-                            initial={{ opacity: 0, scale: 0.92 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: i * 0.04, duration: 0.3 }}
-                            whileHover={{ scale: 1.04, borderColor: "rgba(255,75,75,0.35)", color: "rgba(255,255,255,0.85)" }}
-                            className="text-[11px] tracking-[0.12em] uppercase font-semibold px-4 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-white/55 transition-colors duration-200 cursor-default"
-                          >
-                            {tech}
-                          </motion.span>
-                        ))}
-                      </div>
-                    </section>
-
-                    {/* Team */}
-                    <section>
-                      <div className="flex items-center gap-4 mb-7">
-                        <h4 className="text-[10px] tracking-[0.24em] uppercase text-[#ff4b4b] font-bold">
-                          Team
-                        </h4>
-                        <div className="flex-1 h-px bg-white/[0.06]" />
-                      </div>
-
-                      <div className="flex flex-wrap gap-3">
-                        {active.team.map((member, i) => {
-                          const isPm = member.name.includes("(PM)");
-                          const displayName = member.name.replace(" (PM)", "");
-                          return (
-                            <motion.div
-                              key={member.name}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: i * 0.05, duration: 0.4, ease: "easeOut" }}
-                              whileHover={{ 
-                                scale: 1.03, 
-                                backgroundColor: "rgba(255,255,255,0.05)",
-                                borderColor: "rgba(255,75,75,0.25)",
-                                boxShadow: "0 4px 20px -5px rgba(255,75,75,0.08)"
-                              }}
-                              className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.015] pl-2.5 pr-4 py-2 transition-all duration-300 cursor-default"
+                      <div className="relative z-10 flex flex-wrap items-center gap-3 mb-6">
+                        <span className="text-[9px] tracking-[0.2em] text-[#ff4b4b] font-bold uppercase bg-[#ff4b4b]/10 px-3 py-1.5 rounded-full border border-[#ff4b4b]/20">
+                          {active.category}
+                        </span>
+                        <span className="text-[9px] tracking-[0.2em] text-white/45 font-bold uppercase bg-white/[0.04] px-3 py-1.5 rounded-full border border-white/10">
+                          {active.status}
+                        </span>
+                        <div className="flex items-center gap-4 ml-auto">
+                          <span className="text-[10px] text-white/25 font-mono">{active.year}</span>
+                          {active.github && (
+                            <motion.a
+                              href={active.github}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-wider uppercase px-3 py-1.5 rounded-xl border border-[#ff4b4b]/30 text-[#ff4b4b] bg-[#ff4b4b]/5 hover:bg-[#ff4b4b]/10 hover:border-[#ff4b4b]/50 transition-colors"
                             >
-                              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#ff4b4b]/15 to-[#ff4b4b]/5 border border-[#ff4b4b]/20 text-[#ff4b4b] text-[10px] font-bold flex items-center justify-center shrink-0 shadow-inner">
-                                {member.initials}
-                              </div>
-                              <div className="flex items-center gap-2 min-w-0">
-                                <span className="text-xs font-semibold text-white/90 truncate leading-none">
-                                  {displayName}
-                                </span>
-                                {isPm && (
-                                  <span className="text-[8px] font-mono font-extrabold px-1.5 py-0.5 rounded-md bg-[#ff4b4b]/12 border border-[#ff4b4b]/25 text-[#ff4b4b] uppercase tracking-widest leading-none scale-[0.9]">
-                                    PM
-                                  </span>
-                                )}
+                              <GitHubIcon />
+                              GitHub
+                            </motion.a>
+                          )}
+                        </div>
+                      </div>
+
+                      <h3 className="relative z-10 text-[42px] text-white font-semibold tracking-tight leading-[1.05] mb-4">
+                        {active.name}
+                      </h3>
+                      <p className="relative z-10 text-[15px] text-white/60 leading-relaxed max-w-[680px]">
+                        {active.desc}
+                      </p>
+                    </div>
+
+                    <div className="px-10 py-10 space-y-12">
+
+                      {/* Capabilities */}
+                      <section>
+                        <div className="flex items-center gap-4 mb-7">
+                          <h4 className="text-[10px] tracking-[0.24em] uppercase text-[#ff4b4b] font-bold">
+                            Capabilities
+                          </h4>
+                          <div className="flex-1 h-px bg-white/[0.06]" />
+                        </div>
+
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          {active.capabilities && active.capabilities.map((cap, i) => (
+                            <motion.div
+                              key={cap.title}
+                              initial={{ opacity: 0, y: 12 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                              whileHover={{ y: -4, borderColor: "rgba(255,75,75,0.25)" }}
+                              className="group rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 transition-colors duration-300"
+                            >
+                              <div className="flex items-start gap-3.5">
+                                <div className="mt-0.5 w-6 h-6 rounded-lg bg-[#ff4b4b]/10 border border-[#ff4b4b]/20 flex items-center justify-center text-[10px] font-mono font-bold text-[#ff4b4b] shrink-0 group-hover:bg-[#ff4b4b]/20 transition-colors">
+                                  {String(i + 1).padStart(2, "0")}
+                                </div>
+                                <div>
+                                  <h5 className="text-sm font-semibold text-white mb-1.5">{cap.title}</h5>
+                                  <p className="text-[13px] text-white/45 leading-relaxed">{cap.desc}</p>
+                                </div>
                               </div>
                             </motion.div>
-                          );
-                        })}
-                      </div>
-                    </section>
+                          ))}
+                        </div>
+                      </section>
 
+                      {/* Technologies */}
+                      <section>
+                        <div className="flex items-center gap-4 mb-7">
+                          <h4 className="text-[10px] tracking-[0.24em] uppercase text-[#ff4b4b] font-bold">
+                            Technologies
+                          </h4>
+                          <div className="flex-1 h-px bg-white/[0.06]" />
+                        </div>
 
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+                        <div className="flex flex-wrap gap-2.5">
+                          {active.technologies && active.technologies.map((tech, i) => (
+                            <motion.span
+                              key={tech}
+                              initial={{ opacity: 0, scale: 0.92 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: i * 0.04, duration: 0.3 }}
+                              whileHover={{ scale: 1.04, borderColor: "rgba(255,75,75,0.35)", color: "rgba(255,255,255,0.85)" }}
+                              className="text-[11px] tracking-[0.12em] uppercase font-semibold px-4 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-white/55 transition-colors duration-200 cursor-default"
+                            >
+                              {tech}
+                            </motion.span>
+                          ))}
+                        </div>
+                      </section>
+
+                      {/* Team */}
+                      <section>
+                        <div className="flex items-center gap-4 mb-7">
+                          <h4 className="text-[10px] tracking-[0.24em] uppercase text-[#ff4b4b] font-bold">
+                            Team
+                          </h4>
+                          <div className="flex-1 h-px bg-white/[0.06]" />
+                        </div>
+
+                        <div className="flex flex-wrap gap-3">
+                          {active.team && active.team.map((member, i) => {
+                            const isPm = member.name.includes("(PM)");
+                            const displayName = member.name.replace(" (PM)", "");
+                            return (
+                              <motion.div
+                                key={member.name}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.05, duration: 0.4, ease: "easeOut" }}
+                                whileHover={{ 
+                                  scale: 1.03, 
+                                  backgroundColor: "rgba(255,255,255,0.05)",
+                                  borderColor: "rgba(255,75,75,0.25)",
+                                  boxShadow: "0 4px 20px -5px rgba(255,75,75,0.08)"
+                                }}
+                                className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.015] pl-2.5 pr-4 py-2 transition-all duration-300 cursor-default"
+                              >
+                                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#ff4b4b]/15 to-[#ff4b4b]/5 border border-[#ff4b4b]/20 text-[#ff4b4b] text-[10px] font-bold flex items-center justify-center shrink-0 shadow-inner">
+                                  {member.initials}
+                                </div>
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <span className="text-xs font-semibold text-white/90 truncate leading-none">
+                                    {displayName}
+                                  </span>
+                                  {isPm && (
+                                    <span className="text-[8px] font-mono font-extrabold px-1.5 py-0.5 rounded-md bg-[#ff4b4b]/12 border border-[#ff4b4b]/25 text-[#ff4b4b] uppercase tracking-widest leading-none scale-[0.9]">
+                                      PM
+                                    </span>
+                                  )}
+                                </div>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      </section>
+
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              ) : (
+                <div className="flex items-center justify-center h-[400px] border border-white/10 rounded-[32px] bg-white/[0.02] text-white/40 text-sm">
+                  Loading project portfolio...
+                </div>
+              )}
             </div>
           </div>
 

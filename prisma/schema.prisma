@@ -1,0 +1,70 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Member {
+  id           String   @id @default(uuid())
+  name         String
+  role         String
+  department   String   // "presidency", "tech", "media", "hr", "pr"
+  initials     String
+  academic     String
+  quote        String?
+  linkedin     String?
+  github       String?
+  twitter      String?  // Map to X
+  email        String?
+  imageUrl     String?
+  order        Int      @default(0)
+  isLeadership Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+model Project {
+  id           String   @id @default(uuid())
+  num          String
+  category     String
+  status       String
+  name         String
+  desc         String
+  capabilities String   // JSON string of: { title: string, desc: string }[]
+  technologies String   // JSON string of: string[]
+  team         String   // JSON string of: { initials: string, name: string, role: string }[]
+  github       String?
+  year         String
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+model Achievement {
+  id        String   @id @default(uuid())
+  year      String
+  title     String
+  text      String
+  imageUrl  String
+  createdAt DateTime @default(now())
+}
+
+model Sponsor {
+  id        String   @id @default(uuid())
+  name      String
+  tier      String
+  logoUrl   String
+  createdAt DateTime @default(now())
+}
+
+model ContactSubmission {
+  id          String   @id @default(uuid())
+  name        String
+  org         String?
+  email       String
+  kind        String
+  message     String?
+  submittedAt DateTime @default(now())
+  status      String   @default("New") // "New", "Contacted", "Completed"
+}
