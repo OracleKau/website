@@ -16,12 +16,46 @@ export async function POST(req: Request) {
 
     // 2. TODO: Verify Turnstile Spam Protection token
     // - Retrieve TURNSTILE_SECRET_KEY from environment variables (process.env.TURNSTILE_SECRET_KEY).
+      const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+
     // - Retrieve cfToken sent from frontend. If missing, return a 400 Bad Request error.
+        if (!cfToken) {
+      return NextResponse.json(
+        { error: "Missing Turnstile token" },
+        { status: 400 }
+      );
+    }
+       if (!turnstileSecret) {
+      return NextResponse.json(
+        { error: "Server misconfigured (Turnstile secret missing)" },
+        { status: 500 }
+      );
+    }
     // - Make a POST request to "https://challenges.cloudflare.com/turnstile/v0/siteverify" passing
     //   `secret` and `response` (token) as application/x-www-form-urlencoded.
+    const formData = new URLSearchParams();
+    formData.append("secret", turnstileSecret);
+    formData.append("response", cfToken);
+
+    const verifyRes = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
     // - Parse JSON response. If validation fails (!verifyResult.success), return a 400 Bad Request
     //   error saying "Spam check failed, please solve the challenge again."
-    //
+
+        const verifyResult = await verifyRes.json();
+    if (!verifyResult.success) {
+      return NextResponse.json(
+        { error: "Spam check failed, please solve the challenge again." },
+        { status: 400 }
+      );
+    }
+
     // (Temporary bypass log to prevent blocking form submissions before they code this task)
     console.log("TODO: Verify Turnstile token received:", cfToken);
 
