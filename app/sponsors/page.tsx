@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /* ─────────────────── DATA ─────────────────── */
 
@@ -164,20 +164,28 @@ export default function Sponsors() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentSponsors, setCurrentSponsors] = useState<any[]>([]);
   const [cfToken, setCfToken] = useState<string | null>(null);
+  const [turnstileLoaded, setTurnstileLoaded] = useState(false);
+  const turnstileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Register global callback for Turnstile
+    // Register global callbacks for Turnstile
     (window as any).onTurnstileSuccess = (token: string) => {
       setCfToken(token);
     };
 
-    // Load Turnstile script dynamically
+    (window as any).onloadTurnstileCallback = () => {
+      setTurnstileLoaded(true);
+    };
+
+    // Load Turnstile script dynamically with onload callback
     if (!document.querySelector('script[src*="turnstile/v0/api.js"]')) {
       const script = document.createElement("script");
-      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback";
       script.async = true;
       script.defer = true;
       document.body.appendChild(script);
+    } else if ((window as any).turnstile) {
+      setTurnstileLoaded(true);
     }
 
     // Load sponsors from DB
@@ -197,8 +205,25 @@ export default function Sponsors() {
 
     return () => {
       delete (window as any).onTurnstileSuccess;
+      delete (window as any).onloadTurnstileCallback;
     };
   }, []);
+
+  // Programmatically render Turnstile whenever loaded or remounted
+  useEffect(() => {
+    if (turnstileLoaded && (window as any).turnstile && turnstileRef.current) {
+      try {
+        turnstileRef.current.innerHTML = "";
+        (window as any).turnstile.render(turnstileRef.current, {
+          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA",
+          callback: "onTurnstileSuccess",
+          theme: "dark",
+        });
+      } catch (err) {
+        console.warn("Turnstile rendering error:", err);
+      }
+    }
+  }, [turnstileLoaded]);
 
   async function handleSend() {
     if (!form.name.trim() || !form.email.trim() || !cfToken || isSubmitting) return;
@@ -677,12 +702,7 @@ export default function Sponsors() {
 
                   {/* Cloudflare Turnstile Spam Protection */}
                   <div className="flex flex-col gap-2 my-2 align-middle justify-center items-center">
-                    <div
-                      className="cf-turnstile"
-                      data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA"}
-                      data-callback="onTurnstileSuccess"
-                      data-theme="dark"
-                    ></div>
+                    <div ref={turnstileRef}></div>
                   </div>
 
                   <button
