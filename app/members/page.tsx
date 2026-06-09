@@ -115,7 +115,7 @@ export default function Members() {
               >
                 <div className="flex items-center justify-between">
                   <div className="w-11 h-11 rounded-full bg-[#931f1f] text-white font-bold text-sm flex items-center justify-center shadow-lg shadow-red-950/40">
-                    {m.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                    {m.initials || m.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
                   </div>
                   <span className="text-[9px] font-bold tracking-[0.15em] text-[#ff4b4b] bg-[#ff4b4b]/10 px-3 py-1.5 rounded-full border border-[#ff4b4b]/20">
                     {m.role}
@@ -177,7 +177,7 @@ export default function Members() {
                       >
                         <div className="flex items-center justify-between">
                           <div className="w-11 h-11 rounded-full bg-[#931f1f] text-white font-bold text-sm flex items-center justify-center shadow-lg shadow-red-950/40">
-                            {m.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                            {m.initials || m.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
                           </div>
                           <span className="text-[9px] font-bold tracking-[0.15em] text-[#ff4b4b] bg-[#ff4b4b]/10 px-3 py-1.5 rounded-full border border-[#ff4b4b]/20">
                             {m.role}
@@ -200,7 +200,7 @@ export default function Members() {
                         className="bg-white/[0.04] backdrop-blur-xl p-5 rounded-2xl border border-white/10 flex items-center gap-4 transition-all"
                       >
                         <div className="w-10 h-10 rounded-full bg-[#931f1f]/70 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-md shadow-red-950/30">
-                          {m.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                          {m.initials || m.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
                         </div>
                         <h3 className="text-sm font-semibold text-white leading-snug">{m.name}</h3>
                       </motion.div>
