@@ -1,18 +1,68 @@
-// app/members/page.tsx
-"use client";
-
-import { leadership } from "../data/members";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface Member {
+  id: string;
+  name: string;
+  role: string;
+  department: string;
+  initials: string;
+  academic: string;
+  quote?: string | null;
+  linkedin?: string | null;
+  github?: string | null;
+  twitter?: string | null;
+  email?: string | null;
+  imageUrl?: string | null;
+  order: number;
+  isLeadership: boolean;
+}
 
 const cardClass =
   "bg-white/[0.04] backdrop-blur-xl p-6 rounded-2xl border border-white/10 flex flex-col gap-4 transition-all";
 
 export default function Members() {
+  const [members, setMembers] = useState<Member[]>([]);
   const [activeDept, setActiveDept] = useState<string | null>(null);
-  console.log("leadership:", leadership);
-  const activeDepartment = leadership.departments.find((d) => d.id === activeDept) ?? null;
+
+  useEffect(() => {
+    fetch("/api/members")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setMembers(data);
+      })
+      .catch((err) => console.error("Error fetching members:", err));
+  }, []);
+
+  const presidents = members
+    .filter((m) => m.isLeadership && m.department === "presidency")
+    .sort((a, b) => a.order - b.order);
+
+  const deptIds = ["media", "pr", "tech"] as const;
+  const departments = deptIds.map((id) => {
+    const deptMembers = members.filter((m) => m.department === id);
+    const leaders = deptMembers
+      .filter((m) => m.isLeadership)
+      .sort((a, b) => a.order - b.order);
+
+    const head = leaders[0] || null;
+    const vice = leaders[1] || null;
+
+    const regularMembers = deptMembers
+      .filter((m) => !m.isLeadership)
+      .sort((a, b) => a.order - b.order);
+
+    return {
+      id,
+      label: id === "pr" ? "Public Relations" : id.charAt(0).toUpperCase() + id.slice(1),
+      head,
+      vice,
+      members: regularMembers,
+    };
+  });
+
+  const activeDepartment = departments.find((d) => d.id === activeDept) ?? null;
 
   return (
     <>
@@ -51,7 +101,7 @@ export default function Members() {
 
           {/* LEADERS GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-[1200px] mx-auto mb-28">
-            {leadership.presidents.map((m, idx) => (
+            {presidents.map((m, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 45 }}
@@ -86,7 +136,7 @@ export default function Members() {
 
             {/* DEPT TABS */}
             <div className="flex flex-wrap justify-center gap-4 mb-14">
-              {leadership.departments.map((dept) => (
+              {departments.map((dept) => (
                 <button
                   key={dept.id}
                   onClick={() => setActiveDept(activeDept === dept.id ? null : dept.id)}
@@ -113,7 +163,7 @@ export default function Members() {
                 >
                   {/* HEAD & VICE */}
                   <div className="flex flex-col sm:flex-row justify-center gap-6 mb-10">
-                    {[activeDepartment.head, activeDepartment.vice].map((m, idx) => (
+                    {[activeDepartment.head, activeDepartment.vice].filter(Boolean).map((m, idx) => (
                       <motion.div
                         key={idx}
                         initial={{ opacity: 0, y: 30 }}
