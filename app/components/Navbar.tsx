@@ -15,11 +15,15 @@ const LINKS = [
 
 type NavbarProps = {
   cta?: { href: string; label: string };
+  badge?: React.ReactNode;
 };
 
-export default function Navbar({ cta = { href: "/join", label: "Join us" } }: NavbarProps) {
+export default function Navbar({ cta = { href: "/join", label: "Join us" }, badge }: NavbarProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const isRegOpen = process.env.NEXT_PUBLIC_REGISTRATION_OPEN === "true";
+  const showCta = cta.href !== "/join" || isRegOpen;
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -29,8 +33,10 @@ export default function Navbar({ cta = { href: "/join", label: "Join us" } }: Na
   }, [menuOpen]);
 
   useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
+    if (menuOpen) {
+      setTimeout(() => setMenuOpen(false), 0);
+    }
+  }, [pathname, menuOpen]);
 
   const linkClass = (href: string) =>
     pathname === href
@@ -64,17 +70,20 @@ export default function Navbar({ cta = { href: "/join", label: "Join us" } }: Na
         </Link>
 
         <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+          {badge}
           {LINKS.map(({ href, label }) => (
             <Link key={href} href={href} className={linkClass(href)}>
               {label}
             </Link>
           ))}
-          <CtaEl
-            href={cta.href}
-            className="bg-white text-black text-[11px] font-semibold px-4 py-2 rounded-full hover:bg-[#ff4b4b] hover:text-white transition-all duration-300"
-          >
-            {cta.label}
-          </CtaEl>
+          {showCta && (
+            <CtaEl
+              href={cta.href}
+              className="bg-white text-black text-[11px] font-semibold px-4 py-2 rounded-full hover:bg-[#ff4b4b] hover:text-white transition-all duration-300"
+            >
+              {cta.label}
+            </CtaEl>
+          )}
         </div>
 
         <button
@@ -103,6 +112,7 @@ export default function Navbar({ cta = { href: "/join", label: "Join us" } }: Na
 
       {menuOpen && (
         <div className="md:hidden border-t border-white/10 px-5 py-4 flex flex-col gap-1">
+          {badge && <div className="mb-2 flex justify-center">{badge}</div>}
           {LINKS.map(({ href, label }) => (
             <Link
               key={href}
@@ -113,13 +123,15 @@ export default function Navbar({ cta = { href: "/join", label: "Join us" } }: Na
               {label}
             </Link>
           ))}
-          <CtaEl
-            href={cta.href}
-            onClick={() => setMenuOpen(false)}
-            className="mt-2 text-center bg-white text-black text-[11px] font-semibold px-4 py-3 rounded-full hover:bg-[#ff4b4b] hover:text-white transition-all duration-300"
-          >
-            {cta.label}
-          </CtaEl>
+          {showCta && (
+            <CtaEl
+              href={cta.href}
+              onClick={() => setMenuOpen(false)}
+              className="mt-2 text-center bg-white text-black text-[11px] font-semibold px-4 py-3 rounded-full hover:bg-[#ff4b4b] hover:text-white transition-all duration-300"
+            >
+              {cta.label}
+            </CtaEl>
+          )}
         </div>
       )}
     </motion.nav>

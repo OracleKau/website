@@ -8,6 +8,7 @@ async function main() {
   await db.achievement.deleteMany({});
   await db.sponsor.deleteMany({});
   await db.contactSubmission.deleteMany({});
+  await db.event.deleteMany({});
 
   console.log("Seeding achievements...");
   const achievements = [
@@ -80,7 +81,6 @@ async function main() {
         role: p.role,
         department: "presidency",
         initials,
-        academic: "KAU Student",
         isLeadership: true,
         order: i + 1,
       }
@@ -182,7 +182,6 @@ async function main() {
         role: dept.head.role,
         department: dept.id,
         initials: dept.head.name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase(),
-        academic: "KAU Student",
         isLeadership: true,
         order: 1,
       }
@@ -195,7 +194,6 @@ async function main() {
         role: dept.vice.role,
         department: dept.id,
         initials: dept.vice.name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase(),
-        academic: "KAU Student",
         isLeadership: true,
         order: 2,
       }
@@ -210,7 +208,6 @@ async function main() {
           role: "MEMBER",
           department: dept.id,
           initials: m.name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase(),
-          academic: "KAU Student",
           isLeadership: false,
           order: 10 + j,
         }
@@ -294,6 +291,18 @@ async function main() {
   for (const p of projects) {
     await db.project.create({ data: p });
   }
+
+  console.log("Seeding events...");
+  const defaultEvent = {
+    title: "Intro to Oracle Cloud Infrastructure",
+    description: "Join us for an immersive, hands-on workshop introducing the core concepts of Oracle Cloud Infrastructure (OCI). You will learn how to configure virtual cloud networks (VCNs), boot secure compute instances, manage cloud storage, and deploy web applications on free-tier cloud instances. Recommended for all CS and IT students.",
+    date: new Date("2026-06-15T16:00:00Z"),
+    location: "Building 31, Room 204",
+    locationLink: "https://maps.google.com/?q=King+Abdulaziz+University+Jeddah",
+    type: "Workshop",
+    rsvpLink: "/join",
+  };
+  await db.event.create({ data: defaultEvent });
 
   console.log("Database seeded successfully!");
 }

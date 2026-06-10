@@ -1,12 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 
+interface Achievement {
+  id: string;
+  year: string;
+  title: string;
+  text: string;
+  imageUrl: string;
+  image?: string;
+}
+
 export default function Achievements() {
-  const [achievements, setAchievements] = useState<any[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
 
   useEffect(() => {
     fetch("/api/achievements")
@@ -240,7 +248,7 @@ export default function Achievements() {
             className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-28"
           >
             {[
-              { num: "50+", label: "Members" },
+              { num: "70+", label: "Members" },
               { num: "3",   label: "Projects" },
               { num: "10+", label: "Events" },
               { num: "4",   label: "Departments" },

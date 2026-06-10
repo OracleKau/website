@@ -1,14 +1,13 @@
 // app/join/page.tsx
 "use client";
 
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
 
 /* ─────────────────── DATA ─────────────────── */
 
-const APPLICATIONS_OPEN = false; // flip to true when cycle opens
+const APPLICATIONS_OPEN = process.env.NEXT_PUBLIC_REGISTRATION_OPEN === "true"; // flip to true in env when cycle opens
 
 const openRoles = [
   {
@@ -119,7 +118,7 @@ function NotifyForm() {
           className="flex items-center gap-3 text-sm"
         >
           <div className="w-7 h-7 rounded-full border border-[#ff4b4b]/50 flex items-center justify-center text-[#ff4b4b] text-xs">✓</div>
-          <span className="text-white/60">You're on the list — we'll email you when applications open.</span>
+          <span className="text-white/60">You&apos;re on the list — we&apos;ll email you when applications open.</span>
         </motion.div>
       ) : (
         <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3 flex-wrap">
@@ -277,7 +276,7 @@ export default function JoinUs() {
               transition={{ duration: 0.65, delay: 0.14 }}
               className="text-white/50 text-lg leading-relaxed max-w-[500px] mb-12"
             >
-              Oracle Club is KAU's home for builders, designers, and problem solvers.
+              Oracle Club is KAU&apos;s home for builders, designers, and problem solvers.
               We ship real products, run real events, and learn from each other every week.
             </motion.p>
 
@@ -337,7 +336,7 @@ export default function JoinUs() {
               className="mt-24 pt-10 border-t border-white/[0.08] grid grid-cols-2 md:grid-cols-4 gap-10"
             >
               {[
-                { value: "700+", label: "Active Members",    note: "CS, AI & Engineering" },
+                { value: "70+", label: "Active Members",    note: "CS, AI & Engineering" },
                 { value: "3",    label: "Departments",       note: "Engineering, Design, Ops" },
                 { value: "15+",  label: "Open Roles",        note: "Across all departments" },
                 { value: "48h",  label: "Response Time",     note: "After applying" },
@@ -366,12 +365,12 @@ export default function JoinUs() {
                 transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
               >
                 <h2 className="text-[44px] font-semibold tracking-tight leading-tight mb-5">
-                  Don't miss
+                  Don&apos;t miss
                   <br />
                   <span className="text-[#ff4b4b]">the next cycle.</span>
                 </h2>
                 <p className="text-white/45 text-sm leading-relaxed max-w-[380px] mb-8">
-                  We open applications once or twice a year. Leave your email and we'll send
+                  We open applications once or twice a year. Leave your email and we&apos;ll send
                   you a heads-up the moment the next cycle opens — no spam, ever.
                 </p>
                 <NotifyForm />
@@ -419,7 +418,7 @@ export default function JoinUs() {
                 transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
                 className="text-[44px] font-semibold tracking-tight leading-tight"
               >
-                Positions we're
+                Positions we&apos;re
                 <br />
                 <span className="text-[#ff4b4b]">looking to fill.</span>
               </motion.h2>
@@ -431,7 +430,7 @@ export default function JoinUs() {
                 className="text-white/40 text-sm max-w-[280px] leading-relaxed md:text-right"
               >
                 These roles will be available when the next application cycle opens.
-                Notify me above so you don't miss it.
+                Notify me above so you don&apos;t miss it.
               </motion.p>
             </div>
 

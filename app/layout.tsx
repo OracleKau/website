@@ -74,7 +74,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body className="bg-transparent text-[#191919] antialiased min-h-screen relative overflow-x-hidden">
+      <body className="bg-[#0a0505] text-white antialiased min-h-screen relative overflow-x-hidden">
         {children}
       </body>
     </html>

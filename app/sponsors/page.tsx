@@ -1,7 +1,6 @@
 // app/sponsors/page.tsx
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
@@ -185,7 +184,7 @@ export default function Sponsors() {
       script.defer = true;
       document.body.appendChild(script);
     } else if ((window as any).turnstile) {
-      setTurnstileLoaded(true);
+      setTimeout(() => setTurnstileLoaded(true), 0);
     }
 
     // Load sponsors from DB
@@ -292,9 +291,9 @@ export default function Sponsors() {
               transition={{ duration: 0.65, delay: 0.14 }}
               className="text-white/50 text-lg leading-relaxed max-w-[500px] mb-12"
             >
-              Oracle Club is KAU's technology student community. We run hackathons,
+              Oracle Club is KAU&apos;s technology student community. We run hackathons,
               workshops, and projects year-round. Partnering with us is flexible —
-              there's no fixed price tag, just a conversation about what works for you.
+              there&apos;s no fixed price tag, just a conversation about what works for you.
             </motion.p>
 
             <motion.div
@@ -311,12 +310,6 @@ export default function Sponsors() {
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#ff3d3d"; }}
               >
                 Get in touch →
-              </a>
-              <a
-                href="/oracle-sponsorship-deck.pdf"
-                className="border border-white/20 text-white/80 text-sm font-medium px-8 py-3.5 rounded-full hover:border-white/40 hover:text-white transition-all duration-300"
-              >
-                Download Booklet
               </a>
             </motion.div>
 
@@ -418,8 +411,8 @@ export default function Sponsors() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-white/40 text-sm max-w-[300px] leading-relaxed md:text-right"
               >
-                Every partnership is shaped around what's actually useful for
-                both sides. Tell us what you have in mind and we'll figure it out together.
+                Every partnership is shaped around what&apos;s actually useful for
+                both sides. Tell us what you have in mind and we&apos;ll figure it out together.
               </motion.p>
             </div>
 
@@ -457,7 +450,7 @@ export default function Sponsors() {
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#ff3d3d"; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "rgba(255,61,61,0.7)"; }}
                   >
-                    Let's talk →
+                    Let&apos;s talk →
                   </a>
                 </motion.div>
               ))}
@@ -524,13 +517,13 @@ export default function Sponsors() {
                 className="text-[44px] font-semibold tracking-tight leading-tight mb-6"
                 style={{ textShadow: "none" }}
               >
-                Let's talk
+                Let&apos;s talk
                 <br />
                 <span style={{ color: "#ff3d3d" }}>and figure it out.</span>
               </h2>
               <p className="text-white/45 text-sm leading-relaxed mb-10 max-w-[360px]">
                 No fixed packages, no awkward price lists. Tell us who you are and
-                what you'd like to do — we'll suggest a partnership that makes sense
+                what you&apos;d like to do — we&apos;ll suggest a partnership that makes sense
                 for both sides.
               </p>
 
@@ -576,22 +569,7 @@ export default function Sponsors() {
                 </div>
               </div>
 
-              <div className="border border-white/[0.08] rounded-2xl p-6 bg-white/[0.02] flex items-center justify-between gap-6">
-                <div>
-                  <div className="text-sm font-semibold mb-1">Partnership Booklet</div>
-                  <div className="text-xs text-white/35 leading-snug">
-                    A quick overview of who we are and what we do.
-                  </div>
-                </div>
-                <a
-                  href="/oracle-sponsorship-deck.pdf"
-                  className="shrink-0 bg-white text-black text-[11px] font-semibold px-5 py-2.5 rounded-full transition-all duration-300 whitespace-nowrap"
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#ff3d3d"; (e.currentTarget as HTMLElement).style.color = "#fff"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#fff"; (e.currentTarget as HTMLElement).style.color = "#000"; }}
-                >
-                  Download PDF
-                </a>
-              </div>
+
             </motion.div>
 
             {/* Right — form */}
@@ -613,7 +591,7 @@ export default function Sponsors() {
                     ✓
                   </div>
                   <div className="font-semibold text-lg">Message sent!</div>
-                  <div className="text-white/40 text-sm">We'll be in touch within 48 hours.</div>
+                  <div className="text-white/40 text-sm">We&apos;ll be in touch within 48 hours.</div>
                 </div>
               ) : (
                 <div className="bg-white/[0.025] border border-white/[0.07] rounded-3xl p-8 flex flex-col gap-5">

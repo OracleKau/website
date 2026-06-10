@@ -20,9 +20,9 @@ export async function POST(req: Request) {
     }
 
     const data = await req.json();
-    const { name, role, department, initials, academic, quote, imageUrl, linkedin, github, twitter, email, order, isLeadership } = data;
+    const { name, role, department, initials, quote, imageUrl, linkedin, github, twitter, email, order, isLeadership } = data;
 
-    if (!name || !role || !department || !initials || !academic) {
+    if (!name || !role || !department || !initials) {
       return NextResponse.json({ error: "Required fields missing" }, { status: 400 });
     }
 
@@ -32,7 +32,6 @@ export async function POST(req: Request) {
         role,
         department,
         initials,
-        academic,
         quote: quote || null,
         imageUrl: imageUrl || null,
         linkedin: linkedin || null,
@@ -58,7 +57,7 @@ export async function PUT(req: Request) {
     }
 
     const data = await req.json();
-    const { id, name, role, department, initials, academic, quote, imageUrl, linkedin, github, twitter, email, order, isLeadership } = data;
+    const { id, name, role, department, initials, quote, imageUrl, linkedin, github, twitter, email, order, isLeadership } = data;
 
     if (!id) {
       return NextResponse.json({ error: "Member ID required" }, { status: 400 });
@@ -71,7 +70,6 @@ export async function PUT(req: Request) {
         role,
         department,
         initials,
-        academic,
         quote: quote !== undefined ? (quote || null) : undefined,
         imageUrl: imageUrl !== undefined ? (imageUrl || null) : undefined,
         linkedin: linkedin !== undefined ? (linkedin || null) : undefined,

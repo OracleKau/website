@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
-type Tab = "contacts" | "members" | "projects" | "achievements" | "sponsors";
+type Tab = "contacts" | "members" | "projects" | "achievements" | "sponsors" | "events";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -17,6 +17,7 @@ export default function AdminDashboard() {
   const [projects, setProjects] = useState<any[]>([]);
   const [achievements, setAchievements] = useState<any[]>([]);
   const [sponsors, setSponsors] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
   
   // UI states
   const [loadingData, setLoadingData] = useState(false);
@@ -71,6 +72,7 @@ export default function AdminDashboard() {
         }
         else if (tab === "achievements") setAchievements(data);
         else if (tab === "sponsors") setSponsors(data);
+        else if (tab === "events") setEvents(data);
       }
     } catch (err) {
       console.error("Failed to fetch data for " + tab, err);
@@ -231,6 +233,7 @@ export default function AdminDashboard() {
               { id: "projects", label: "Projects" },
               { id: "achievements", label: "Achievements" },
               { id: "sponsors", label: "Sponsors" },
+              { id: "events", label: "Events" },
             ].map((t) => (
               <button
                 key={t.id}
@@ -557,6 +560,54 @@ export default function AdminDashboard() {
                       </tbody>
                     </table>
                   )}
+
+                  {activeTab === "events" && (
+                    <table className="w-full text-left text-sm border-collapse min-w-[700px]">
+                      <thead>
+                        <tr className="border-b border-white/10 text-white/40 text-xs uppercase font-semibold">
+                          <th className="pb-4">Event Title</th>
+                          <th className="pb-4 w-[160px]">Date & Time</th>
+                          <th className="pb-4 w-[160px]">Location</th>
+                          <th className="pb-4 w-[100px]">Type</th>
+                          <th className="pb-4 w-[120px]">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {events.length === 0 ? (
+                          <tr><td colSpan={5} className="text-center text-white/20 py-10">No events found.</td></tr>
+                        ) : (
+                          events.map((ev) => (
+                            <tr key={ev.id} className="border-b border-white/[0.05] hover:bg-white/[0.01]">
+                              <td className="py-4">
+                                <div className="font-semibold">{ev.title}</div>
+                                {ev.rsvpLink && <div className="text-[10px] text-[#ff4b4b] mt-0.5 font-mono truncate max-w-[200px]">{ev.rsvpLink}</div>}
+                              </td>
+                              <td className="py-4 text-xs text-white/60">{new Date(ev.date).toLocaleString()}</td>
+                              <td className="py-4 text-xs text-white/60">{ev.location}</td>
+                              <td className="py-4 text-xs text-white/60 capitalize">{ev.type}</td>
+                              <td className="py-4 space-x-3">
+                                <button
+                                  onClick={() => {
+                                    setCurrentItem(ev);
+                                    setModalOpen(true);
+                                  }}
+                                  className="text-white/40 hover:text-[#ff4b4b] text-xs transition"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(ev.id, ev.title)}
+                                  className="text-white/20 hover:text-red-500 text-xs transition"
+                                >
+                                  Delete
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               )}
             </div>
@@ -609,7 +660,6 @@ function ModalForm({
   const [memberRole, setMemberRole] = useState(item?.role || "MEMBER");
   const [memberDept, setMemberDept] = useState(item?.department || "tech");
   const [memberInitials, setMemberInitials] = useState(item?.initials || "");
-  const [memberAcademic, setMemberAcademic] = useState(item?.academic || "");
   const [memberQuote, setMemberQuote] = useState(item?.quote || "");
   const [memberLinkedin, setMemberLinkedin] = useState(item?.linkedin || "");
   const [memberGithub, setMemberGithub] = useState(item?.github || "");
@@ -650,6 +700,24 @@ function ModalForm({
   const [sponTier, setSponTier] = useState(item?.tier || "Workshop Host");
   const [sponLogoUrl, setSponLogoUrl] = useState(item?.logoUrl || "");
 
+  // Events State
+  const [eventTitle, setEventTitle] = useState(item?.title || "");
+  const [eventDescription, setEventDescription] = useState(item?.description || "");
+  const formatDateTimeLocal = (dateStr: string) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+  const [eventDate, setEventDate] = useState(item?.date ? formatDateTimeLocal(item.date) : "");
+  const [eventLocation, setEventLocation] = useState(item?.location || "");
+  const [eventLocationLink, setEventLocationLink] = useState(item?.locationLink || "");
+  const presets = ["Workshop", "Hackathon", "Talk"];
+  const isPreset = presets.includes(item?.type || "Workshop");
+  const [eventType, setEventType] = useState(isPreset ? (item?.type || "Workshop") : "Other");
+  const [customEventType, setCustomEventType] = useState(isPreset ? "" : (item?.type || ""));
+  const [eventRsvpLink, setEventRsvpLink] = useState(item?.rsvpLink || "");
+
   // File Change handlers
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>, setUrl: (url: string) => void) {
     const file = e.target.files?.[0];
@@ -673,8 +741,12 @@ function ModalForm({
         name: memberName,
         role: memberRole,
         department: memberDept,
-        initials: memberInitials || memberName.split(" ").map((n: string) => n[0]).join("").substring(0,2).toUpperCase(),
-        academic: memberAcademic,
+        initials: memberInitials || (() => {
+          const parts = memberName.trim().split(/\s+/);
+          const f = parts[0] ? parts[0][0] : "";
+          const l = parts.length > 1 ? parts[parts.length - 1][0] : "";
+          return (f + l).toUpperCase();
+        })(),
         quote: memberQuote || null,
         linkedin: memberLinkedin || null,
         github: memberGithub || null,
@@ -701,7 +773,12 @@ function ModalForm({
         technologies: JSON.stringify(cleanedTech),
         team: JSON.stringify(filteredTeam.map((t: any) => ({
           ...t,
-          initials: t.initials || t.name.split(" ").map((n: string) => n[0]).join("").substring(0,2).toUpperCase()
+          initials: t.initials || (() => {
+            const parts = t.name.trim().split(/\s+/);
+            const f = parts[0] ? parts[0][0] : "";
+            const l = parts.length > 1 ? parts[parts.length - 1][0] : "";
+            return (f + l).toUpperCase();
+          })()
         }))),
         github: projectGithub || null,
         year: projectYear,
@@ -721,6 +798,17 @@ function ModalForm({
         name: sponName,
         tier: sponTier,
         logoUrl: sponLogoUrl,
+      };
+    } else if (tab === "events") {
+      payload = {
+        id: item?.id,
+        title: eventTitle,
+        description: eventDescription || null,
+        date: eventDate ? new Date(eventDate).toISOString() : null,
+        location: eventLocation,
+        locationLink: eventLocationLink || null,
+        type: eventType === "Other" ? (customEventType || "Other") : eventType,
+        rsvpLink: eventRsvpLink || null,
       };
     }
 
@@ -814,22 +902,9 @@ function ModalForm({
                     <option value="presidency">Presidency</option>
                     <option value="tech">Tech</option>
                     <option value="media">Media</option>
-                    <option value="hr">Human Resources</option>
                     <option value="pr">Public Relations</option>
                   </select>
                 </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35">Academic Info</label>
-                <input
-                  type="text"
-                  required
-                  value={memberAcademic}
-                  onChange={(e) => setMemberAcademic(e.target.value)}
-                  placeholder="E.g. Computer Science Senior"
-                  className="bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-[#ff4b4b]/40"
-                />
               </div>
 
               <div className="flex flex-col gap-2">
@@ -1225,6 +1300,99 @@ function ModalForm({
             </>
           )}
 
+          {tab === "events" && (
+            <>
+              <div className="flex flex-col gap-2">
+                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35">Event Title</label>
+                <input
+                  type="text"
+                  required
+                  value={eventTitle}
+                  onChange={(e) => setEventTitle(e.target.value)}
+                  placeholder="E.g. Intro to Oracle Cloud Infrastructure"
+                  className="bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-[#ff4b4b]/40"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35">Event Description</label>
+                <textarea
+                  rows={4}
+                  required
+                  value={eventDescription}
+                  onChange={(e) => setEventDescription(e.target.value)}
+                  placeholder="A comprehensive description detailing the event content, speaker info, prerequisites, and learning outcomes..."
+                  className="bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 outline-none resize-none focus:border-[#ff4b4b]/40"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[9px] uppercase tracking-[0.2em] text-white/35">Date & Time</label>
+                  <DateTimePicker value={eventDate} onChange={setEventDate} />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[9px] uppercase tracking-[0.2em] text-white/35">Event Type</label>
+                  <select
+                    value={eventType}
+                    onChange={(e) => setEventType(e.target.value)}
+                    className="bg-[#120a0a] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-[#ff4b4b]/40 cursor-pointer"
+                  >
+                    <option value="Workshop">Workshop</option>
+                    <option value="Hackathon">Hackathon</option>
+                    <option value="Talk">Tech Talk</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  {eventType === "Other" && (
+                    <input
+                      type="text"
+                      required
+                      value={customEventType}
+                      onChange={(e) => setCustomEventType(e.target.value)}
+                      placeholder="E.g. Competition"
+                      className="bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-2 mt-1 text-xs text-white placeholder-white/20 outline-none focus:border-[#ff4b4b]/40"
+                    />
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[9px] uppercase tracking-[0.2em] text-white/35">Location (Room/Building)</label>
+                  <input
+                    type="text"
+                    required
+                    value={eventLocation}
+                    onChange={(e) => setEventLocation(e.target.value)}
+                    placeholder="E.g. Building 31, Room 204"
+                    className="bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-[#ff4b4b]/40"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[9px] uppercase tracking-[0.2em] text-white/35">Location Map Link (URL)</label>
+                  <input
+                    type="url"
+                    value={eventLocationLink}
+                    onChange={(e) => setEventLocationLink(e.target.value)}
+                    placeholder="E.g. https://maps.google.com/?q=..."
+                    className="bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-[#ff4b4b]/40"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-[9px] uppercase tracking-[0.2em] text-white/35">RSVP / Registration Link</label>
+                <input
+                  type="url"
+                  value={eventRsvpLink}
+                  onChange={(e) => setEventRsvpLink(e.target.value)}
+                  placeholder="E.g. https://forms.gle/... (or leave blank to point to Join Us page)"
+                  className="bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-[#ff4b4b]/40"
+                />
+              </div>
+            </>
+          )}
+
           <div className="border-t border-white/10 pt-6 flex items-center justify-end gap-3 shrink-0">
             <button
               type="button"
@@ -1245,4 +1413,275 @@ function ModalForm({
       </motion.div>
     </motion.div>
   );
+}
+
+// Custom Date & Time Picker Popover Component
+function DateTimePicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const parsed = parseDateTimeLocal(value);
+
+  const [viewYear, setViewYear] = useState(parsed.year);
+  const [viewMonth, setViewMonth] = useState(parsed.month); // 0-11
+
+  const handleToggleOpen = () => {
+    if (!isOpen) {
+      const p = parseDateTimeLocal(value);
+      setViewYear(p.year);
+      setViewMonth(p.month);
+    }
+    setIsOpen(!isOpen);
+  };
+
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const startDayOfWeek = new Date(viewYear, viewMonth, 1).getDay();
+
+  const formatFriendlyDate = (val: string) => {
+    if (!val) return "Select date and time";
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return "Select date and time";
+    return d.toLocaleString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
+  const handlePrevMonth = () => {
+    if (viewMonth === 0) {
+      setViewMonth(11);
+      setViewYear(prev => prev - 1);
+    } else {
+      setViewMonth(prev => prev - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (viewMonth === 11) {
+      setViewMonth(0);
+      setViewYear(prev => prev + 1);
+    } else {
+      setViewMonth(prev => prev + 1);
+    }
+  };
+
+  const updateValue = (newYear: number, newMonth: number, newDay: number, newHour24: number, newMinute: number) => {
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const formatted = `${newYear}-${pad(newMonth + 1)}-${pad(newDay)}T${pad(newHour24)}:${pad(newMinute)}`;
+    onChange(formatted);
+  };
+
+  const handleSelectDay = (day: number) => {
+    updateValue(viewYear, viewMonth, day, parsed.hour, parsed.minute);
+  };
+
+  const displayHour = parsed.hour === 0 ? 12 : parsed.hour > 12 ? parsed.hour - 12 : parsed.hour;
+  const amPm = parsed.hour >= 12 ? "PM" : "AM";
+
+  const handleHourChange = (newHour12: number) => {
+    let newHour24 = newHour12;
+    if (amPm === "PM") {
+      newHour24 = newHour12 === 12 ? 12 : newHour12 + 12;
+    } else {
+      newHour24 = newHour12 === 12 ? 0 : newHour12;
+    }
+    updateValue(parsed.year, parsed.month, parsed.day, newHour24, parsed.minute);
+  };
+
+  const handleMinuteChange = (newMinute: number) => {
+    updateValue(parsed.year, parsed.month, parsed.day, parsed.hour, newMinute);
+  };
+
+  const handlePeriodChange = (newPeriod: "AM" | "PM") => {
+    let newHour24 = displayHour;
+    if (newPeriod === "PM") {
+      newHour24 = displayHour === 12 ? 12 : displayHour + 12;
+    } else {
+      newHour24 = displayHour === 12 ? 0 : displayHour;
+    }
+    updateValue(parsed.year, parsed.month, parsed.day, newHour24, parsed.minute);
+  };
+
+  return (
+    <div className="relative w-full" ref={containerRef}>
+      <button
+        type="button"
+        onClick={handleToggleOpen}
+        className="w-full text-left bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 outline-none focus:border-[#ff4b4b]/40 flex items-center justify-between hover:border-white/20 transition cursor-pointer select-none"
+      >
+        <span className={value ? "text-white font-medium" : "text-white/30"}>
+          {formatFriendlyDate(value)}
+        </span>
+        <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute left-0 right-0 mt-2 z-50 bg-[#151212]/95 border border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-xl max-w-[340px] mx-auto md:max-w-none">
+          {/* Header Month/Year */}
+          <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
+            <button
+              type="button"
+              onClick={handlePrevMonth}
+              className="p-1 hover:bg-white/5 rounded-lg transition text-white/60 hover:text-white"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <span className="text-xs font-semibold uppercase tracking-wider text-white">
+              {months[viewMonth]} {viewYear}
+            </span>
+            <button
+              type="button"
+              onClick={handleNextMonth}
+              className="p-1 hover:bg-white/5 rounded-lg transition text-white/60 hover:text-white"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Weekday Labels */}
+          <div className="grid grid-cols-7 gap-1 text-center mb-1">
+            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((wd, i) => (
+              <span key={i} className="text-[10px] uppercase font-bold text-white/30 py-1">
+                {wd}
+              </span>
+            ))}
+          </div>
+
+          {/* Day Grid */}
+          <div className="grid grid-cols-7 gap-1 text-center">
+            {Array.from({ length: startDayOfWeek }).map((_, i) => (
+              <div key={`empty-${i}`} className="p-1.5" />
+            ))}
+
+            {Array.from({ length: daysInMonth }).map((_, i) => {
+              const dayNum = i + 1;
+              const isSelected = parsed.day === dayNum && parsed.month === viewMonth && parsed.year === viewYear;
+              return (
+                <button
+                  key={dayNum}
+                  type="button"
+                  onClick={() => handleSelectDay(dayNum)}
+                  className={`p-1.5 text-xs font-semibold rounded-lg transition-all ${
+                    isSelected
+                      ? "bg-[#ff3d3d] text-white shadow-lg shadow-red-950/50"
+                      : "text-white/70 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  {dayNum}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Time Picker Row */}
+          <div className="flex items-center justify-between border-t border-white/5 pt-3 mt-3">
+            <span className="text-[10px] uppercase tracking-wider font-bold text-white/40 flex items-center gap-1">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Time
+            </span>
+
+            <div className="flex items-center gap-1.5 bg-black/40 border border-white/5 rounded-xl px-2.5 py-1">
+              {/* Hour Dropdown */}
+              <select
+                value={displayHour}
+                onChange={(e) => handleHourChange(Number(e.target.value))}
+                className="bg-transparent text-xs text-white font-semibold outline-none border-none cursor-pointer pr-1 focus:ring-0 [&>option]:bg-[#151212]"
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
+                  <option key={h} value={h}>{String(h).padStart(2, "0")}</option>
+                ))}
+              </select>
+              <span className="text-white/30 text-xs font-bold">:</span>
+              {/* Minute Dropdown */}
+              <select
+                value={parsed.minute}
+                onChange={(e) => handleMinuteChange(Number(e.target.value))}
+                className="bg-transparent text-xs text-white font-semibold outline-none border-none cursor-pointer pr-1 focus:ring-0 [&>option]:bg-[#151212]"
+              >
+                {Array.from({ length: 60 }, (_, i) => i).map(m => (
+                  <option key={m} value={m}>{String(m).padStart(2, "0")}</option>
+                ))}
+              </select>
+              {/* AM/PM Dropdown */}
+              <select
+                value={amPm}
+                onChange={(e) => handlePeriodChange(e.target.value as "AM" | "PM")}
+                className="bg-transparent text-xs text-[#ff4b4b] font-bold outline-none border-none cursor-pointer pl-1 focus:ring-0 [&>option]:bg-[#151212] [&>option]:text-white"
+              >
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Confirm Button */}
+          <button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            className="w-full bg-[#ff3d3d]/10 hover:bg-[#ff3d3d] border border-[#ff3d3d]/20 hover:border-transparent text-white font-bold text-[10px] uppercase tracking-widest py-2 rounded-xl mt-3 transition duration-200"
+          >
+            Confirm Selection
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function parseDateTimeLocal(val: string) {
+  if (!val) {
+    const d = new Date();
+    return {
+      year: d.getFullYear(),
+      month: d.getMonth(),
+      day: d.getDate(),
+      hour: d.getHours(),
+      minute: d.getMinutes(),
+    };
+  }
+  const parts = val.split("T");
+  const dateParts = parts[0].split("-");
+  const timeParts = parts[1] ? parts[1].split(":") : ["0", "0"];
+
+  return {
+    year: parseInt(dateParts[0]) || new Date().getFullYear(),
+    month: (parseInt(dateParts[1]) - 1) >= 0 ? (parseInt(dateParts[1]) - 1) : new Date().getMonth(),
+    day: parseInt(dateParts[2]) || new Date().getDate(),
+    hour: parseInt(timeParts[0]) || 0,
+    minute: parseInt(timeParts[1]) || 0,
+  };
 }

@@ -13,6 +13,12 @@
 
 @import "tailwindcss";
 
+html,
+body {
+  background-color: #0a0505;
+  color: #ffffff;
+}
+
 :root {
   --background-hex: #FCF8F5;
   --grid-line-color: rgba(147, 31, 31, 0.10);

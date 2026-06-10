@@ -1,7 +1,6 @@
 // app/about/page.tsx
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import { useEffect, useRef } from "react";

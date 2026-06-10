@@ -1,5 +1,5 @@
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -13,7 +13,6 @@ model Member {
   role         String
   department   String   // "presidency", "tech", "media", "hr", "pr"
   initials     String
-  academic     String
   quote        String?
   linkedin     String?
   github       String?
@@ -67,4 +66,16 @@ model ContactSubmission {
   message     String?
   submittedAt DateTime @default(now())
   status      String   @default("New") // "New", "Contacted", "Completed"
+}
+
+model Event {
+  id           String   @id @default(uuid())
+  title        String
+  description  String?  // Full event details description
+  date         DateTime
+  location     String
+  locationLink String?  // Clickable link (e.g. Google Maps)
+  type         String   // E.g. "Workshop", "Hackathon", "Talk"
+  rsvpLink     String?  // Optional external RSVP link
+  createdAt    DateTime @default(now())
 }
