@@ -15,9 +15,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: "Oracle Club KAU",
-
-  // CHANGED THIS
-  description: "Banana",
+  description: "The official web platform for Oracle Student Club at King Abdulaziz University, Jeddah. Bridging theory and practice, building real-world student-led solutions.",
 
   icons: {
     icon: [
@@ -37,9 +35,7 @@ export const metadata: Metadata = {
 
   openGraph: {
     title: "Oracle Club KAU",
-
-    // CHANGED THIS TOO
-    description: "Banana",
+    description: "The official web platform for Oracle Student Club at King Abdulaziz University, Jeddah. Bridging theory and practice, building real-world student-led solutions.",
 
     type: "website",
 
@@ -65,8 +61,6 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable}`}
     >
       <head>
-        <script src="https://cdn.tailwindcss.com"></script>
-
         <link
           rel="icon"
           type="image/png"

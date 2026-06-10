@@ -40,12 +40,12 @@ const openRoles = [
 ];
 
 const members = [
-  { name: "Rayan Al-Zahrani",  role: "President",          dept: "Leadership",   avatar: "R", calendly: "#", email: "rayan@oracle-kau.sa" },
-  { name: "Sara Bukhari",      role: "VP Engineering",     dept: "Engineering",  avatar: "S", calendly: "#", email: "sara@oracle-kau.sa" },
-  { name: "Faisal Al-Ghamdi",  role: "VP Design",          dept: "Design",       avatar: "F", calendly: "#", email: "faisal@oracle-kau.sa" },
-  { name: "Lama Al-Otaibi",    role: "Events Lead",        dept: "Operations",   avatar: "L", calendly: "#", email: "lama@oracle-kau.sa" },
-  { name: "Omar Sindi",        role: "AI / ML Lead",       dept: "Engineering",  avatar: "O", calendly: "#", email: "omar@oracle-kau.sa" },
-  { name: "Nora Al-Shehri",    role: "Sponsorship Lead",   dept: "Operations",   avatar: "N", calendly: "#", email: "nora@oracle-kau.sa" },
+  { name: "Ammar Essam Koshak",        role: "Club President",              dept: "Leadership",   avatar: "A", calendly: "#", email: "ammar.koshak@kau.edu.sa" },
+  { name: "Joud Yasser Alaskar",       role: "Club President",              dept: "Leadership",   avatar: "J", calendly: "#", email: "joud.alaskar@kau.edu.sa" },
+  { name: "Mohammed Ahmad Justanieah", role: "Club Vice President",         dept: "Leadership",   avatar: "M", calendly: "#", email: "mohammed.justanieah@kau.edu.sa" },
+  { name: "Shahad Khalid Kadasa",      role: "Human Resources Officer",     dept: "Operations",   avatar: "S", calendly: "#", email: "shahad.kadasa@kau.edu.sa" },
+  { name: "Wihad Ahmed Alotaibi",      role: "Tech Department Leader",      dept: "Engineering",  avatar: "W", calendly: "#", email: "wihad.otaibi@kau.edu.sa" },
+  { name: "Sedra Faisal Alyamani",     role: "Public Relations Leader",     dept: "Operations",   avatar: "S", calendly: "#", email: "sedra.yamani@kau.edu.sa" },
 ];
 
 const deptColors: Record<string, string> = {

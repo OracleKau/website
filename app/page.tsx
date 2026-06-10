@@ -155,7 +155,7 @@ export default function Home() {
             >
               <motion.div whileHover={{ y: -2, scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                 <Link
-                  href="/contact"
+                  href="/join"
                   className="flex items-center gap-2 rounded-full bg-[#ff4b4b] px-8 py-4 text-[12px] font-bold tracking-wider uppercase text-white shadow-lg shadow-red-900/40 transition-colors hover:bg-white hover:text-black"
                 >
                   Apply for Fall 2026 <span className="text-[14px]">&rarr;</span>
@@ -268,7 +268,7 @@ export default function Home() {
                   whileTap={{ scale: 0.97 }}
                 >
                   <Link
-                    href="/contact"
+                    href="/join"
                     className="block rounded-xl py-3.5 text-center text-[11px] font-bold uppercase tracking-wider text-white transition-colors hover:brightness-110 bg-[#ff4b4b] shadow-md shadow-red-900/30"
                   >
                     RSVP Free &rarr;
