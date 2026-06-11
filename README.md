@@ -42,8 +42,31 @@ A full-stack web platform built with Next.js, PostgreSQL, and a custom admin das
 ## Local Development Setup
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18+)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — required for the PostgreSQL database
+
+You need two things installed on your machine before you can run this project:
+
+#### 1. Node.js (v18 or higher)
+Node.js is the JavaScript runtime that runs the Next.js development server and all tooling (`npm`, `npx`).
+
+- Download from: https://nodejs.org/ — choose the **LTS** version
+- After installing, verify it works by opening a terminal and running:
+  ```bash
+  node -v
+  npm -v
+  ```
+  Both should print a version number.
+
+#### 2. Docker Desktop
+Docker is used to run the PostgreSQL database locally inside a container, so you don't need to install PostgreSQL manually on your machine.
+
+- Download from: https://www.docker.com/products/docker-desktop/
+- Install it and **open Docker Desktop** — you should see it running in your taskbar/system tray
+- **Important:** Docker Desktop must be open and running every time you work on this project, before you run `docker compose up -d`
+- Verify Docker is running:
+  ```bash
+  docker -v
+  ```
+  Should print a version number. If it says "command not found", Docker is not installed or not running.
 
 ### 1. Clone the repository
 
@@ -86,11 +109,20 @@ NEXT_PUBLIC_REGISTRATION_OPEN="false"
 
 ### 4. Start the database
 
+Make sure **Docker Desktop is open and running** first (check your taskbar — you should see the Docker whale icon).
+
+Then run:
+
 ```bash
 docker compose up -d
 ```
 
-This starts a PostgreSQL container on port `5432`. Docker Desktop must be running.
+This downloads and starts a PostgreSQL database container in the background on port `5432`. You only need to do this once — Docker remembers the container and you can restart it anytime with the same command.
+
+To stop the database when you're done working:
+```bash
+docker compose down
+```
 
 ### 5. Set up the database schema and seed data
 
