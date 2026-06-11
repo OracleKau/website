@@ -1,3 +1,10 @@
+// /////////////////////////////////////////////////////////////////////////
+// PRISMA DATABASE SCHEMA
+// /////////////////////////////////////////////////////////////////////////
+// Defines models, fields, types, and constraints for the PostgreSQL DB.
+// Sync database schema: `npx prisma db push`
+// Generate Client SDK:  `npx prisma generate`
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -7,75 +14,93 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// =========================================================================
+// Member: Club administrators, leaders, and standard members
+// =========================================================================
 model Member {
   id           String   @id @default(uuid())
-  name         String
-  role         String
-  department   String   // "presidency", "tech", "media", "hr", "pr"
-  initials     String
-  quote        String?
-  linkedin     String?
-  github       String?
-  twitter      String?  // Map to X
-  email        String?
-  imageUrl     String?
-  order        Int      @default(0)
-  isLeadership Boolean  @default(false)
+  name         String   // Full name of the member
+  role         String   // E.g. "President", "Developer", "Media Lead"
+  department   String   // Target department: "presidency", "tech", "media", "hr", "pr"
+  initials     String   // Initial characters (used for placeholder avatars)
+  quote        String?  // Personal quote shown on card hover
+  linkedin     String?  // Optional LinkedIn profile URL
+  github       String?  // Optional GitHub profile URL
+  twitter      String?  // Optional X (Twitter) profile URL
+  email        String?  // Contact email
+  imageUrl     String?  // Hosted headshot image file path/URL
+  order        Int      @default(0)     // Display sequence ordering order
+  isLeadership Boolean  @default(false) // Flags if member is part of the leadership board
   createdAt    DateTime @default(now())
 }
 
+// =========================================================================
+// Project: Live projects and applications developed by the club
+// =========================================================================
 model Project {
   id           String   @id @default(uuid())
-  num          String
-  category     String
-  status       String
-  name         String
-  desc         String
-  capabilities String   // JSON string of: { title: string, desc: string }[]
-  technologies String   // JSON string of: string[]
-  team         String   // JSON string of: { initials: string, name: string, role: string }[]
-  github       String?
-  year         String
-  order        Int      @default(0)
+  num          String   // Display number identifier (e.g. "01")
+  category     String   // E.g. "Web Application", "Machine Learning"
+  status       String   // E.g. "Completed", "Active", "Beta"
+  name         String   // Project title name
+  desc         String   // High-level description text
+  capabilities String   // Stored JSON string of: { title: string, desc: string }[]
+  technologies String   // Stored JSON string of: string[]
+  team         String   // Stored JSON string of: { initials: string, name: string, role: string }[]
+  github       String?  // Optional GitHub repository link
+  year         String   // Year of project creation
+  order        Int      @default(0)     // Display sequence ordering order
   createdAt    DateTime @default(now())
 }
 
+// =========================================================================
+// Achievement: Awards, milestones, and hackathon wins
+// =========================================================================
 model Achievement {
   id        String   @id @default(uuid())
-  year      String
-  title     String
-  text      String
-  imageUrl  String
+  year      String   // Year of the milestone (e.g., "2025")
+  title     String   // Title of achievement
+  text      String   // Descriptive summary of the accomplishment
+  imageUrl  String   // Hosted icon/milestone image path
   createdAt DateTime @default(now())
 }
 
+// =========================================================================
+// Sponsor: Partner organizations and sponsors displaying on Sponsors page
+// =========================================================================
 model Sponsor {
   id        String   @id @default(uuid())
-  name      String
-  tier      String
-  logoUrl   String
+  name      String   // Partner name
+  tier      String   // Tier level: "gold", "silver", "bronze", or "partner"
+  logoUrl   String   // Hosted brand image file path/URL
   createdAt DateTime @default(now())
 }
 
+// =========================================================================
+// ContactSubmission: Sponsor inquiry and partner contact applications
+// =========================================================================
 model ContactSubmission {
   id          String   @id @default(uuid())
-  name        String
-  org         String?
-  email       String
-  kind        String
-  message     String?
+  name        String   // Contact submitter's full name
+  org         String?  // Organization/Company affiliation
+  email       String   // Contact email address
+  kind        String   // Submission category: "Sponsorship", "Partnership", "Other"
+  message     String?  // Custom descriptive message content
   submittedAt DateTime @default(now())
-  status      String   @default("New") // "New", "Contacted", "Completed"
+  status      String   @default("New") // Processing status: "New", "Contacted", "Completed"
 }
 
+// =========================================================================
+// Event: Scheduled upcoming club events and workshops
+// =========================================================================
 model Event {
   id           String   @id @default(uuid())
-  title        String
-  description  String?  // Full event details description
-  date         DateTime
-  location     String
-  locationLink String?  // Clickable link (e.g. Google Maps)
-  type         String   // E.g. "Workshop", "Hackathon", "Talk"
-  rsvpLink     String?  // Optional external RSVP link
+  title        String   // Event title
+  description  String?  // Full event details description (supports rich text/lists)
+  date         DateTime // Event schedule date and time
+  location     String   // Physical hall/room or virtual venue link description
+  locationLink String?  // Clickable URL map location (e.g. Google Maps)
+  type         String   // E.g. "Workshop", "Hackathon", "Seminar"
+  rsvpLink     String?  // Registration form redirect target URL (defaults to /join)
   createdAt    DateTime @default(now())
 }

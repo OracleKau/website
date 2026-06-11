@@ -1,16 +1,34 @@
+# =========================================================================
+# DOCKER COMPOSE CONFIGURATION (Local Database Service)
+# =========================================================================
+# This compose file spins up a local PostgreSQL database instance for testing
+# and development. Run `docker-compose up -d` to launch in the background.
+
 services:
   postgres:
+    # Use lightweight alpine-based official image for PostgreSQL v15
     image: postgres:15-alpine
     container_name: oracle_postgres
+    
+    # Automatically restart container if it crashes or the daemon reboots
     restart: always
+    
+    # Configure initial superuser credentials and main database name
+    # - Ensure these match the values specified in the DATABASE_URL in .env
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgrespassword
       POSTGRES_DB: oracle_db
+      
+    # Expose the database server port 5432 to host port 5432
     ports:
       - '5432:5432'
+      
+    # Mount persistent named volume to prevent data loss when container stops
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+# Define named persistent volume for PostgreSQL database storage
 volumes:
   pgdata:
+

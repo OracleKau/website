@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-// TODO (Teammate Task): Import jwt from "jsonwebtoken" to sign tokens
 import jwt from "jsonwebtoken";
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
 
-    // TODO: Credentials Authentication & Secure Cookie Handling
-    // 1. Fetch credentials (ADMIN_EMAIL, ADMIN_PASSWORD, and JWT_SECRET) from process.env.
+    // Authenticate against admin credentials stored in environment variables
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;
     const jwtSecret = process.env.JWT_SECRET;

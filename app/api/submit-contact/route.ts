@@ -56,9 +56,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // (Temporary bypass log to prevent blocking form submissions before they code this task)
-    console.log("TODO: Verify Turnstile token received:", cfToken);
-
     // 3. Save the contact form submission to the SQLite database
     const submission = await db.contactSubmission.create({
       data: {

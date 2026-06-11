@@ -236,8 +236,8 @@ async function main() {
         { initials: "RA", name: "Rania Almutairi", role: "" },
         { initials: "RA", name: "Remass Ashmawi", role: "" },
       ]),
-      github: "https://github.com/daniaalshehri1/oracle-club-website",
-      year: "2024",
+      github: "https://github.com/OracleKau/website",
+      year: "2026",
       order: 1,
     },
     {

@@ -1,10 +1,8 @@
 import { cookies } from "next/headers";
-// TODO: Import jwt from "jsonwebtoken" to verify sessions
 import * as jwt from "jsonwebtoken";
 
 export async function verifyAdminSession(): Promise<boolean> {
   try {
-    // TODO: Secure Session Verification logic
     // 1. Access cookies using cookies() utility from next/headers.
   const cookieStore = await cookies();
 

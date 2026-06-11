@@ -92,10 +92,8 @@ export default function Navbar({ cta = { href: "/join", label: "Join us" } }: Na
 
   // Clean-up side-effect automatically closing mobile navigation panel when pathname changes
   useEffect(() => {
-    if (menuOpen) {
-      setTimeout(() => setMenuOpen(false), 0);
-    }
-  }, [pathname, menuOpen]);
+    setMenuOpen(false);
+  }, [pathname]);
 
   // Class builder highlights the link text if the route matches the current active pathname
   const linkClass = (href: string) =>

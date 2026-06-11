@@ -430,12 +430,13 @@ export default function AdminDashboard() {
                           <th className="pb-4">Project</th>
                           <th className="pb-4">Category</th>
                           <th className="pb-4">Status</th>
+                          <th className="pb-4">GitHub Repository</th>
                           <th className="pb-4 w-[120px]">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {projects.length === 0 ? (
-                          <tr><td colSpan={5} className="text-center text-white/20 py-10">No projects found.</td></tr>
+                          <tr><td colSpan={6} className="text-center text-white/20 py-10">No projects found.</td></tr>
                         ) : (
                           projects.map((p) => (
                             <tr key={p.id} className="border-b border-white/[0.05] hover:bg-white/[0.01]">
@@ -443,6 +444,20 @@ export default function AdminDashboard() {
                               <td className="py-4 font-semibold">{p.name}</td>
                               <td className="py-4 text-xs text-white/60">{p.category}</td>
                               <td className="py-4 text-xs text-white/60">{p.status}</td>
+                              <td className="py-4 text-xs">
+                                {p.github ? (
+                                  <a
+                                    href={p.github}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[#ff4b4b] hover:underline truncate max-w-[180px] inline-block font-mono"
+                                  >
+                                    {p.github.replace("https://github.com/", "")}
+                                  </a>
+                                ) : (
+                                  <span className="text-white/25">None</span>
+                                )}
+                              </td>
                               <td className="py-4 space-x-3">
                                 <button
                                   onClick={() => {
