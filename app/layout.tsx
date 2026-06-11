@@ -1,18 +1,24 @@
 // app/layout.tsx
+// Core root layout configuration for the Next.js application.
+// This file sets up fonts, SEO metadata, icons, and wrapping elements for every page.
+
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
+// Configure standard Inter Google Font for sans-serif utility usage throughout the project
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
 });
 
+// Configure Playfair Display Google Font for elegant serif text / heading styles
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
 });
 
+// Define SEO metadata, including basic tags, site title, descriptive info, custom site icons, and OpenGraph configs for sharing links.
 export const metadata: Metadata = {
   title: "Oracle Club KAU",
   description: "The official web platform for Oracle Student Club at King Abdulaziz University, Jeddah. Bridging theory and practice, building real-world student-led solutions.",
@@ -50,6 +56,7 @@ export const metadata: Metadata = {
   },
 };
 
+// Root layout element rendering the global HTML wrapper, document head, and base dark-theme body styling
 export default function RootLayout({
   children,
 }: {
@@ -61,6 +68,7 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable}`}
     >
       <head>
+        {/* Declare basic favicon files and apple touch icon pointers */}
         <link
           rel="icon"
           type="image/png"
@@ -74,9 +82,10 @@ export default function RootLayout({
         />
       </head>
 
+      {/* Initialize global theme style attributes (such as the default background, white text, smooth anti-aliasing, and responsive boundaries) */}
       <body className="bg-[#0a0505] text-white antialiased min-h-screen relative overflow-x-hidden">
         {children}
       </body>
     </html>
   );
-}
+}

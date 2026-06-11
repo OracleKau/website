@@ -1,4 +1,8 @@
 // app/sponsors/page.tsx
+// This page manages partnerships and sponsors info for the Oracle Student Club.
+// It includes statistical targets, partnership avenues, dynamically loaded current sponsors,
+// and a secure contact query form guarded by Cloudflare Turnstile CAPTCHA.
+
 "use client";
 
 import Image from "next/image";
@@ -6,14 +10,16 @@ import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import { useState, useEffect, useRef } from "react";
 
-/* ─────────────────── DATA ─────────────────── */
+/* ─────────────────── STATIC DATA CONFIGURATIONS ─────────────────── */
 
+// Core statistics showcasing the impact of the student club to potential sponsors
 const heroStats = [
   { value: "70+", label: "Active Members", note: "CS, AI & Engineering" },
   { value: "5+", label: "Projects Shipped", note: "Real products, real users" },
   { value: "15+", label: "Events per Year", note: "Hackathons, talks, demos" },
 ];
 
+// Activities catalog detailing club programs
 const activities = [
   {
     tag: "Annual",
@@ -47,6 +53,7 @@ const activities = [
   },
 ];
 
+// Support options outline for potential corporate partners
 const ways = [
   {
     icon: "◈",
@@ -86,9 +93,7 @@ const ways = [
   },
 ];
 
-// Sponsors are fetched dynamically from the database.
-
-/* ─────────────────── BACKGROUND ─────────────────── */
+/* ─────────────────── VISUAL BACKGROUND ─────────────────── */
 
 function Background() {
   return (
@@ -115,7 +120,7 @@ function Background() {
   );
 }
 
-/* ─────────────────── SECTION LABEL ─────────────────── */
+/* ─────────────────── SECTION LABEL INDICATOR ─────────────────── */
 
 function SectionLabel({ index, label }: { index: string; label: string }) {
   return (
@@ -129,11 +134,12 @@ function SectionLabel({ index, label }: { index: string; label: string }) {
   );
 }
 
-/* ─────────────────── SPONSOR LOGO ─────────────────── */
+/* ─────────────────── SPONSOR LOGO FALLBACK ─────────────────── */
 
 function SponsorLogo({ name, logo }: { name: string; logo: string }) {
   const [errored, setErrored] = useState(false);
 
+  // Render first letter fallback if image fails to resolve
   if (errored) {
     return (
       <div className="w-14 h-14 mx-auto bg-white/[0.05] group-hover:bg-white/[0.09] rounded-full mb-5 flex items-center justify-center text-white/40 text-sm font-semibold transition-all duration-300">
@@ -155,9 +161,10 @@ function SponsorLogo({ name, logo }: { name: string; logo: string }) {
   );
 }
 
-/* ─────────────────── PAGE ─────────────────── */
+/* ─────────────────── MAIN SPONSORS PAGE COMPONENT ─────────────────── */
 
 export default function Sponsors() {
+  // Local state structures collecting form input values, submission tracking, and sponsor data list
   const [form, setForm] = useState({ name: "", org: "", email: "", kind: "", message: "" });
   const [sent, setSent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -166,6 +173,7 @@ export default function Sponsors() {
   const [turnstileLoaded, setTurnstileLoaded] = useState(false);
   const turnstileRef = useRef<HTMLDivElement>(null);
 
+  // Hook registering Turnstile callbacks and initiating sponsors database fetches
   useEffect(() => {
     // Register global callbacks for Turnstile
     (window as any).onTurnstileSuccess = (token: string) => {
@@ -176,7 +184,7 @@ export default function Sponsors() {
       setTurnstileLoaded(true);
     };
 
-    // Load Turnstile script dynamically with onload callback
+    // Lazy load the Turnstile script dynamically if not present on page initialization
     if (!document.querySelector('script[src*="turnstile/v0/api.js"]')) {
       const script = document.createElement("script");
       script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback";
@@ -187,7 +195,7 @@ export default function Sponsors() {
       setTimeout(() => setTurnstileLoaded(true), 0);
     }
 
-    // Load sponsors from DB
+    // Retrieve active sponsors records from database api route
     fetch("/api/sponsors")
       .then((res) => res.json())
       .then((data) => {
@@ -202,13 +210,14 @@ export default function Sponsors() {
       })
       .catch((err) => console.error("Error fetching sponsors:", err));
 
+    // Cleanup globals on component removal
     return () => {
       delete (window as any).onTurnstileSuccess;
       delete (window as any).onloadTurnstileCallback;
     };
   }, []);
 
-  // Programmatically render Turnstile whenever loaded or remounted
+  // Programmatically render Turnstile CAPTCHA box inside target div once loaded
   useEffect(() => {
     if (turnstileLoaded && (window as any).turnstile && turnstileRef.current) {
       try {
@@ -224,6 +233,7 @@ export default function Sponsors() {
     }
   }, [turnstileLoaded]);
 
+  // Action handler validating entries, processing, and HTTP posting contact queries
   async function handleSend() {
     if (!form.name.trim() || !form.email.trim() || !cfToken || isSubmitting) return;
     setIsSubmitting(true);
@@ -255,7 +265,7 @@ export default function Sponsors() {
 
       <main className="relative z-[3] text-white">
 
-        {/* ══ HERO ═══════════════════════════════════════════════════ */}
+        {/* ══ HERO SECTION ═══════════════════════════════════════════════════ */}
         <section className="min-h-screen flex flex-col justify-center px-10 pt-32 pb-24">
           <div className="max-w-[1200px] mx-auto w-full">
 
@@ -313,7 +323,7 @@ export default function Sponsors() {
               </a>
             </motion.div>
 
-            {/* Stats */}
+            {/* Metric counters layout grid row */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -333,7 +343,7 @@ export default function Sponsors() {
 
         <SectionLabel index="01" label="What We Do" />
 
-        {/* ══ ACTIVITIES ═════════════════════════════════════════════ */}
+        {/* ══ ACTIVITIES GRID ROW ═════════════════════════════════════════════ */}
         <section className="px-10 py-24">
           <div className="max-w-[1200px] mx-auto">
 
@@ -387,7 +397,7 @@ export default function Sponsors() {
 
         <SectionLabel index="02" label="Ways to Get Involved" />
 
-        {/* ══ WAYS TO PARTNER ════════════════════════════════════════ */}
+        {/* ══ WAYS TO PARTNER GRID BLOCK ════════════════════════════════════ */}
         <section className="px-10 py-24">
           <div className="max-w-[1200px] mx-auto">
 
@@ -460,7 +470,7 @@ export default function Sponsors() {
 
         <SectionLabel index="03" label="Current Sponsors" />
 
-        {/* ══ CURRENT SPONSORS ═══════════════════════════════════════ */}
+        {/* ══ CURRENT SPONSORS GRID DISPLAY ═══════════════════════════════════ */}
         <section className="px-10 py-24">
           <div className="max-w-[1200px] mx-auto">
             <motion.h2
@@ -502,11 +512,11 @@ export default function Sponsors() {
 
         <SectionLabel index="04" label="Get in Touch" />
 
-        {/* ══ CONTACT ════════════════════════════════════════════════ */}
+        {/* ══ CONTACT FORM SECTION WITH SPAM CAPTCHA PROTECTION ═══════════════ */}
         <section id="contact" className="px-10 py-24 pb-40">
           <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
 
-            {/* Left */}
+            {/* Left Hand side information column */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -569,10 +579,9 @@ export default function Sponsors() {
                 </div>
               </div>
 
-
             </motion.div>
 
-            {/* Right — form */}
+            {/* Right Hand side form entry capture inputs block */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -580,6 +589,7 @@ export default function Sponsors() {
               transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             >
               {sent ? (
+                // Success submission status feedback pane
                 <div
                   className="rounded-3xl p-16 text-center flex flex-col items-center gap-4 min-h-[400px] justify-center"
                   style={{ border: "1px solid rgba(255,61,61,0.25)", background: "rgba(255,61,61,0.04)" }}
@@ -594,6 +604,7 @@ export default function Sponsors() {
                   <div className="text-white/40 text-sm">We&apos;ll be in touch within 48 hours.</div>
                 </div>
               ) : (
+                // Base input structure layout fields
                 <div className="bg-white/[0.025] border border-white/[0.07] rounded-3xl p-8 flex flex-col gap-5">
 
                   <div className="grid grid-cols-2 gap-4">
@@ -678,7 +689,7 @@ export default function Sponsors() {
                     />
                   </div>
 
-                  {/* Cloudflare Turnstile Spam Protection */}
+                  {/* Cloudflare Turnstile Spam Protection widget container element mount ref */}
                   <div className="flex flex-col gap-2 my-2 align-middle justify-center items-center">
                     <div ref={turnstileRef}></div>
                   </div>

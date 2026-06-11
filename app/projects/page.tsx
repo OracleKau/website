@@ -1,4 +1,8 @@
 // app/projects/page.tsx
+// This page displays a technical portfolio of student-led projects. It features
+// a split view: a list selector on the left, and a detailed specifications panel on the right.
+// Project data is fetched dynamically and field strings are parsed safely as JSON.
+
 "use client";
 
 import Link from "next/link";
@@ -6,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 
+// Local structures defining team members, capabilities, and detailed project items
 type TeamMember = {
   initials: string;
   name: string;
@@ -31,12 +36,14 @@ type Project = {
   year: string;
 };
 
+// Transition configuration variables for the right details panel animations
 const panelVariants = {
   initial: { opacity: 0, y: 16, filter: "blur(4px)" },
   animate: { opacity: 1, y: 0, filter: "blur(0px)" },
   exit: { opacity: 0, y: -12, filter: "blur(4px)" },
 };
 
+// SVG component rendering the GitHub brand logo
 const GitHubIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
@@ -44,9 +51,11 @@ const GitHubIcon = () => (
 );
 
 export default function Projects() {
+  // Local state tracking fetched projects array and currently active project index identifier
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  // Fetch project records from API route on mount, parsing database fields safely
   useEffect(() => {
     fetch("/api/projects")
       .then((res) => res.json())
@@ -54,6 +63,7 @@ export default function Projects() {
         if (Array.isArray(data)) {
           const parsed = data.map((p) => {
             try {
+              // Parse stringified database columns into local arrays/objects safely
               return {
                 ...p,
                 capabilities: typeof p.capabilities === "string" ? JSON.parse(p.capabilities) : p.capabilities,
@@ -74,15 +84,17 @@ export default function Projects() {
       .catch((err) => console.error("Error fetching projects:", err));
   }, []);
 
+  // Compute reference to the currently active project
   const active = projects.find((p) => p.id === activeId) ?? projects[0];
 
   return (
     <>
-      {/* ─────────────────── BACKGROUND (Pipeline Theme) ─────────────────── */}
+      {/* ─────────────────── BACKGROUND LAYERS (Pipeline Theme) ─────────────────── */}
       <div
         className="fixed inset-0 z-0"
         style={{ background: "linear-gradient(160deg, #110808 0%, #1c0d0d 50%, #2a1010 100%)" }}
       />
+      {/* Light linear lines repeating diagonal pattern overlay */}
       <div
         className="fixed inset-0 z-[1] pointer-events-none opacity-[0.02]"
         style={{
@@ -90,6 +102,7 @@ export default function Projects() {
         }}
       />
 
+      {/* Floating decorative code symbols (brackets and braces) animated by Framer Motion */}
       <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden font-mono text-white/[0.03] select-none">
         <motion.div
           animate={{ y: [0, -30, 0], opacity: [0.5, 1, 0.5] }}
@@ -114,6 +127,7 @@ export default function Projects() {
         </motion.div>
       </div>
 
+      {/* Ambient background glow shapes */}
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
@@ -127,7 +141,7 @@ export default function Projects() {
         }}
       />
       <motion.div
-        animate={{ scale: [1.2, 1, 1.2], opacity: [0.4, 0.6, 0.4] }}
+        animate={{ scale: [1.2, 1.2, 1.2], opacity: [0.4, 0.6, 0.4] }}
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 5 }}
         className="fixed z-[1] pointer-events-none"
         style={{
@@ -152,7 +166,7 @@ export default function Projects() {
         }}
       />
 
-      {/* ─────────────────── HERO IMAGE ─────────────────── */}
+      {/* ─────────────────── HERO IMAGE SECTION ─────────────────── */}
       <div className="relative z-[2] w-full h-[520px] overflow-hidden">
         <motion.img
           initial={{ scale: 1.12, opacity: 0 }}
@@ -189,7 +203,7 @@ export default function Projects() {
       <main className="relative z-[3] px-10 py-32">
         <div className="max-w-[1400px] mx-auto">
 
-          {/* SECTION TITLE */}
+          {/* PORTFOLIO SECTION TITLE */}
           <motion.div
             initial={{ opacity: 0, y: 35 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -211,10 +225,10 @@ export default function Projects() {
             <div className="w-16 h-[2px] bg-[#ff4b4b]/60 mx-auto mt-6" />
           </motion.div>
 
-          {/* PROJECT SELECTOR + DETAIL */}
+          {/* PROJECT SELECTOR + INTERACTIVE SPLIT VIEWER DETAIL */}
           <div className="grid lg:grid-cols-[340px_1fr] gap-8 lg:gap-12 items-start">
 
-            {/* SELECTOR */}
+            {/* LEFT SELECTOR: Vertical list of project tabs */}
             <motion.div
               initial={{ opacity: 0, x: -24 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -241,6 +255,7 @@ export default function Projects() {
                         : "bg-white/[0.02] border-white/10 hover:bg-white/[0.04] hover:border-white/20",
                     ].join(" ")}
                   >
+                    {/* Visual sliding active indicator bar using Framer Motion layoutId */}
                     {isActive && (
                       <motion.div
                         layoutId="project-active-bar"
@@ -249,6 +264,7 @@ export default function Projects() {
                       />
                     )}
 
+                    {/* Project Category Tag & Number */}
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <span
                         className={[
@@ -272,6 +288,7 @@ export default function Projects() {
                       {project.name}
                     </h3>
 
+                    {/* Status & Build Year */}
                     <div className="flex items-center justify-between">
                       <span
                         className={[
@@ -288,7 +305,7 @@ export default function Projects() {
               })}
             </motion.div>
 
-            {/* DETAIL PANEL */}
+            {/* RIGHT DETAIL PANEL: Renders the active selected project specifications */}
             <div className="min-h-[640px]">
               {active ? (
                 <AnimatePresence mode="wait">
@@ -301,11 +318,12 @@ export default function Projects() {
                     transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
                     className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-[32px] overflow-hidden"
                   >
-                    {/* Panel header */}
+                    {/* Active Project header card metadata information */}
                     <div
                       className="relative px-10 pt-10 pb-8 border-b border-white/[0.06]"
                       style={{ background: "linear-gradient(135deg, rgba(147,31,31,0.14), rgba(0,0,0,0.2))" }}
                     >
+                      {/* Background decorative index number */}
                       <div className="absolute -bottom-4 -right-2 text-[140px] font-bold text-white/[0.025] leading-none select-none pointer-events-none">
                         {active.num}
                       </div>
@@ -319,6 +337,7 @@ export default function Projects() {
                         </span>
                         <div className="flex items-center gap-4 ml-auto">
                           <span className="text-[10px] text-white/25 font-mono">{active.year}</span>
+                          {/* GitHub link button wrapper details */}
                           {active.github && (
                             <motion.a
                               href={active.github}
@@ -345,7 +364,7 @@ export default function Projects() {
 
                     <div className="px-10 py-10 space-y-12">
 
-                      {/* Capabilities */}
+                      {/* Capabilities section detailing features built into the project */}
                       <section>
                         <div className="flex items-center gap-4 mb-7">
                           <h4 className="text-[10px] tracking-[0.24em] uppercase text-[#ff4b4b] font-bold">
@@ -378,7 +397,7 @@ export default function Projects() {
                         </div>
                       </section>
 
-                      {/* Technologies */}
+                      {/* Technologies tags list detailing stacks used in building */}
                       <section>
                         <div className="flex items-center gap-4 mb-7">
                           <h4 className="text-[10px] tracking-[0.24em] uppercase text-[#ff4b4b] font-bold">
@@ -403,7 +422,7 @@ export default function Projects() {
                         </div>
                       </section>
 
-                      {/* Team */}
+                      {/* Team grid row mapping the student authors */}
                       <section>
                         <div className="flex items-center gap-4 mb-7">
                           <h4 className="text-[10px] tracking-[0.24em] uppercase text-[#ff4b4b] font-bold">
@@ -460,7 +479,7 @@ export default function Projects() {
             </div>
           </div>
 
-          {/* Footer strip */}
+          {/* Footer strip details */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -481,3 +500,4 @@ export default function Projects() {
     </>
   );
 }
+

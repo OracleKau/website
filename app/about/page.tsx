@@ -1,10 +1,14 @@
 // app/about/page.tsx
+// This page provides a description of the Oracle Student Club's core values, mission,
+// and basic metrics, accompanied by a dynamic canvas-based red binary matrix rain background.
+
 "use client";
 
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import { useEffect, useRef } from "react";
 
+// Drop object signature describing coordinate parameters for drawing canvas columns
 type Drop = {
   x: number;
   y: number;
@@ -14,8 +18,10 @@ type Drop = {
 };
 
 export default function About() {
+  // Reference hook pointing directly to the HTML5 canvas element
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  // Initialize and run the binary matrix rain animation loop on layout mount
   useEffect(() => {
     const canvasEl = canvasRef.current;
     if (!canvasEl) return;
@@ -26,15 +32,18 @@ export default function About() {
     const canvas = canvasEl;
     const ctx = context;
 
+    // Characters array to pull randomly from for matrix raindrops
     const bits = ["0", "1"];
 
     let animId: number;
 
+    // Width of columns and font size configurations for rendering raindrops
     const colWidth = 36;
     const fontSize = 32;
 
     let drops: Drop[] = [];
 
+    // Helper builder generating customized coordinate attributes for a column drop
     function makeDrop(x: number): Drop {
       return {
         x,
@@ -45,10 +54,12 @@ export default function About() {
       };
     }
 
+    // Set screen boundaries and map drops list starting positions
     function init() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
+      // Start rendering raindrops from 42% width of screen to right border
       const startX = canvas.width * 0.42;
       const cols = Math.floor((canvas.width - startX) / colWidth);
 
@@ -57,6 +68,7 @@ export default function About() {
       );
     }
 
+    // Main drawing loop clearing the screen and applying translation vectors
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -65,7 +77,9 @@ export default function About() {
       const fadeStart = canvas.width * 0.42;
       const fadeEnd = canvas.width * 0.65;
 
+      // Iterate and render each column raindrop
       for (const d of drops) {
+        // Calculate transparency fade relative to its screen position
         const fadeFactor = Math.min(
           1,
           Math.max(0, (d.x - fadeStart) / (fadeEnd - fadeStart))
@@ -76,8 +90,10 @@ export default function About() {
         ctx.fillStyle = `rgba(255, 45, 45, ${finalAlpha})`;
         ctx.fillText(d.char, d.x, d.y);
 
+        // Advance drop downward by its speed vector
         d.y += d.speed;
 
+        // Reset drop position back to top when it traverses past bottom border
         if (d.y > canvas.height + fontSize) {
           const fresh = makeDrop(d.x);
           d.y = fresh.y;
@@ -87,9 +103,11 @@ export default function About() {
         }
       }
 
+      // Schedule next redraw frame iteration
       animId = requestAnimationFrame(draw);
     }
 
+    // Recalculate columns mapping upon screen dimension changes
     const handleResize = () => init();
 
     init();
@@ -97,6 +115,7 @@ export default function About() {
 
     window.addEventListener("resize", handleResize);
 
+    // Remove event listeners and cancel request animation loops upon component unmount
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", handleResize);
@@ -105,12 +124,12 @@ export default function About() {
 
   return (
     <>
-      {/* ───────────────── BACKGROUND ───────────────── */}
+      {/* ───────────────── BACKGROUND VISUAL LAYERS ───────────────── */}
       <div
         className="fixed inset-0 -z-10 overflow-hidden"
         style={{ background: "linear-gradient(160deg, #0a0505 0%, #150a0a 50%, #200c0c 100%)" }}
       >
-        {/* Noise Texture */}
+        {/* Noise Texture backdrop */}
         <div
           className="absolute inset-0 z-10 pointer-events-none"
           style={{
@@ -121,7 +140,7 @@ export default function About() {
           }}
         />
 
-        {/* Fading Grid */}
+        {/* Fading Grid coordinates line overlay */}
         <div
           className="absolute inset-0"
           style={{
@@ -133,7 +152,7 @@ export default function About() {
           }}
         />
 
-        {/* Gradient Orbs */}
+        {/* Ambient background glowing orbs */}
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15], rotate: [0, 90, 0] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
@@ -146,16 +165,16 @@ export default function About() {
         />
       </div>
 
-      {/* MATRIX RAIN */}
+      {/* Canvas backdrop container capturing matrix rain loop output */}
       <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[1]" />
 
       <Navbar />
 
-      {/* ───────────────── MAIN ───────────────── */}
+      {/* ───────────────── MAIN ABOUT LAYOUT SECTION ───────────────── */}
       <main className="relative z-[3] min-h-screen pt-[120px] flex flex-col justify-center">
         <div className="max-w-[1400px] mx-auto w-full px-6 py-16 md:px-10 flex flex-col lg:grid lg:grid-cols-[1fr_1px_0.6fr] gap-16 lg:gap-0 items-center">
 
-          {/* LEFT: TEXT */}
+          {/* LEFT SECTION: Context copy headings */}
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
@@ -184,10 +203,10 @@ export default function About() {
             </div>
           </motion.div>
 
-          {/* VERTICAL DIVIDER */}
+          {/* Vertical divider line separating text from stats */}
           <div className="hidden lg:block self-stretch bg-gradient-to-b from-transparent via-white/10 to-transparent w-[1px]" />
 
-          {/* RIGHT: STATS */}
+          {/* RIGHT SECTION: Metric statistics layout counters */}
           <div className="w-full lg:pl-20 grid grid-cols-3 lg:grid-cols-1 gap-8 lg:gap-0">
             {[
               { num: "70+", label: "Active\nMembers" },
@@ -214,4 +233,4 @@ export default function About() {
       </main>
     </>
   );
-}
+}

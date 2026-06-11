@@ -1,11 +1,17 @@
 // app/page.tsx
+// This is the core landing page (home) component for the Oracle Student Club website.
+// It features a dynamic orbital theme, ambient glows, hero section, metrics counters, 
+// a floating upcoming event card, and an interactive details modal overlay.
+
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "./components/Navbar";
+import EventDetailsModal from "./components/EventDetailsModal";
 
+// Local type signature defining upcoming events structure fetched from DB
 type Event = {
   id: string;
   title: string;
@@ -18,11 +24,15 @@ type Event = {
 };
 
 export default function Home() {
+  // Local states managing floating calendar card visibility, upcoming events data, and detail modal open toggles
   const [showEventCard, setShowEventCard] = useState(true);
   const [upcomingEvent, setUpcomingEvent] = useState<Event | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  
+  // Read runtime environment variable flags to verify if join registrations are active
   const isRegOpen = process.env.NEXT_PUBLIC_REGISTRATION_OPEN === "true";
 
+  // Fetch the current upcoming scheduled event from API endpoint on mount
   useEffect(() => {
     fetch("/api/events/upcoming")
       .then((res) => res.json())
@@ -36,13 +46,14 @@ export default function Home() {
       .catch((err) => console.error("Error fetching upcoming event:", err));
   }, []);
 
-  // Professional academic and technical stats
+  // Professional academic and technical stats counters list
   const stats = [
     { num: "70+", label: "Active Members" },
     { num: "10+", label: "Live Projects" },
     { num: "5+", label: "Workshops" },
   ];
 
+  // Helper utility function calculating day offsets to display localized calendar text
   const getDaysLeftText = (dateStr: string) => {
     const eventDate = new Date(dateStr);
     const today = new Date();
@@ -59,15 +70,15 @@ export default function Home() {
 
   return (
     <>
-      {/* ───────────────── BACKGROUND (Core / Orbit Theme) ───────────────── */}
+      {/* ───────────────── BACKGROUND VISUAL LAYERS (Orbital Theme) ───────────────── */}
       
-      {/* DEEP DARK BASE */}
+      {/* Deep baseline background gradient overlay */}
       <div
         className="fixed inset-0 z-0"
         style={{ background: "linear-gradient(160deg, #0a0505 0%, #150a0a 50%, #200c0c 100%)" }}
       />
 
-      {/* RADIAL BURST LINES */}
+      {/* Repeating fine radial lines burst effect simulating rays */}
       <div
         className="fixed inset-0 z-[1] pointer-events-none opacity-80"
         style={{
@@ -83,7 +94,7 @@ export default function Home() {
         }}
       />
 
-      {/* ORBITAL RINGS */}
+      {/* Dynamic orbital lines overlay, rotating infinitely using Framer Motion loops */}
       <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden flex items-center justify-center opacity-70">
         <motion.div
           animate={{ rotate: 360 }}
@@ -102,7 +113,7 @@ export default function Home() {
         />
       </div>
 
-      {/* PULSING CORE GLOW */}
+      {/* Primary pulsing radial glow overlay on the left border */}
       <motion.div
         animate={{ scale: [1, 1.15, 1], opacity: [0.15, 0.3, 0.15] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
@@ -116,7 +127,7 @@ export default function Home() {
         }}
       />
 
-      {/* SECONDARY AMBIENT GLOW */}
+      {/* Secondary atmospheric background glow in the bottom-right region */}
       <div
         className="fixed z-[1] pointer-events-none"
         style={{
@@ -128,7 +139,7 @@ export default function Home() {
         }}
       />
 
-      {/* VIGNETTE & NOISE */}
+      {/* Ambient vignette framing and noise texture block */}
       <div
         className="fixed inset-0 z-[2] pointer-events-none"
         style={{
@@ -145,30 +156,17 @@ export default function Home() {
         }}
       />
 
-      <Navbar
-        badge={
-          upcomingEvent && (
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setDetailsOpen(true)}
-              className="flex items-center gap-2 rounded-full border px-3 py-1.5 text-[9px] font-bold tracking-[0.15em] uppercase bg-[#ff4b4b]/10 border-[#ff4b4b]/20 hover:border-[#ff4b4b]/40 hover:bg-[#ff4b4b]/20 text-[#ff4b4b] transition duration-200 cursor-pointer select-none mr-2"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-[#ff4b4b] animate-pulse" />
-              {getDaysLeftText(upcomingEvent.date)}
-            </motion.button>
-          )
-        }
-      />
+      {/* Global Navbar element rendering the navigation bar */}
+      <Navbar />
 
-      {/* ───────────────── HERO ───────────────── */}
+      {/* ───────────────── HERO SECTION ───────────────── */}
       <main className="relative z-[3] flex min-h-screen items-center px-6 md:px-10 pt-[96px] pb-[160px]">
         <div className="mx-auto w-full max-w-[1400px]">
 
-          {/* HERO CONTENT */}
+          {/* Grid column wrapping hero copy */}
           <div className="max-w-[780px]">
 
-            {/* BADGE */}
+            {/* Club authentication status pill badge with animated pulse dot */}
             <motion.div
               initial={{ opacity: 0, x: -12 }}
               animate={{ opacity: 1, x: 0 }}
@@ -179,7 +177,7 @@ export default function Home() {
               Official Student Club &middot; KAU Jeddah
             </motion.div>
 
-            {/* PROFESSIONAL HEADLINE */}
+            {/* Bold brand headline (uses custom BANANA typography font class) */}
             <motion.h1
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -191,7 +189,7 @@ export default function Home() {
               Building <span className="text-[#ff4b4b]">Real Impact.</span>
             </motion.h1>
 
-            {/* PROFESSIONAL BODY */}
+            {/* Professional introductory paragraph description */}
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -201,7 +199,7 @@ export default function Home() {
               Oracle Student Club empowers King Abdulaziz University students to transform academic knowledge into real-world solutions. We collaborate to design, build, and deploy live platforms that serve our campus and community.
             </motion.p>
 
-            {/* CTAs */}
+            {/* Call to action navigation redirect triggers */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -229,7 +227,7 @@ export default function Home() {
               </motion.div>
             </motion.div>
 
-            {/* STATS */}
+            {/* Metrics counter grid listing active stats */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -258,7 +256,7 @@ export default function Home() {
         </div>
       </main>
 
-      {/* ───────────────── FLOATING EVENT CARD ───────────────── */}
+      {/* ───────────────── FLOATING EVENT CARD (Bottom Right Panel) ───────────────── */}
       <AnimatePresence>
         {showEventCard && upcomingEvent && (
           <motion.div
@@ -269,7 +267,7 @@ export default function Home() {
             whileHover={{ y: -4 }}
             className="fixed bottom-8 right-8 z-40 w-[360px] rounded-[24px] border border-white/10 bg-[#151212]/90 p-7 backdrop-blur-2xl shadow-2xl shadow-black/50"
           >
-            {/* subtle inner top glow */}
+            {/* Subtle inner top glow overlay */}
             <div
               className="pointer-events-none absolute inset-0 rounded-[24px]"
               style={{
@@ -279,7 +277,7 @@ export default function Home() {
             />
 
             <div className="relative z-10">
-              {/* header row */}
+              {/* Header section with blinking status dot and close button */}
               <div className="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
                 <div className="flex items-center gap-2 rounded-full border border-[#ff4b4b]/20 bg-[#ff4b4b]/10 px-3 py-1.5 text-[9px] font-bold tracking-[0.2em] text-[#ff4b4b] uppercase">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ff4b4b]" />
@@ -296,14 +294,15 @@ export default function Home() {
                 </motion.button>
               </div>
 
-              {/* title */}
+              {/* Event headline title text */}
               <h3 className="mb-5 text-lg font-semibold leading-snug text-white">
                 {upcomingEvent.title}
               </h3>
 
-              {/* date + location row */}
+              {/* Calendar details and location indicators row */}
               <div className="mb-6 flex items-end justify-between">
                 <div className="leading-none">
+                  {/* Large date display (BANANA font style) */}
                   <span className="font-BANANA text-[48px] text-white">
                     {new Date(upcomingEvent.date).getDate()}
                   </span>
@@ -315,6 +314,7 @@ export default function Home() {
                   </div>
                 </div>
 
+                {/* Location text or interactive map link */}
                 <div className="text-right">
                   {upcomingEvent.locationLink ? (
                     <a
@@ -336,7 +336,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* CTAs */}
+              {/* Action trigger buttons */}
               <div className="flex items-center gap-3 pt-2">
                 <motion.div
                   className="flex-1"
@@ -366,143 +366,11 @@ export default function Home() {
       </AnimatePresence>
 
       {/* ───────────────── EVENT DETAILS MODAL ───────────────── */}
-      <AnimatePresence>
-        {detailsOpen && upcomingEvent && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-6"
-            onClick={() => setDetailsOpen(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              transition={{ type: "spring", duration: 0.5 }}
-              className="relative w-full max-w-[500px] rounded-[32px] border border-white/10 bg-[#151212]/95 p-8 shadow-2xl overflow-hidden text-white"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Subtle inner top glow */}
-              <div
-                className="pointer-events-none absolute inset-0 rounded-[32px]"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at 50% -20%, rgba(255,75,75,0.18) 0%, transparent 65%)",
-                }}
-              />
-
-              <div className="relative z-10 flex flex-col gap-6">
-                {/* Header Row */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                  <div className="flex items-center gap-2 rounded-full border border-[#ff4b4b]/20 bg-[#ff4b4b]/10 px-3 py-1.5 text-[9px] font-bold tracking-[0.2em] text-[#ff4b4b] uppercase">
-                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#ff4b4b]" />
-                    {upcomingEvent.type} Details
-                  </div>
-                  <motion.button
-                    whileHover={{ rotate: 90, scale: 1.15 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setDetailsOpen(false)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-bold text-white/40 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
-                  >
-                    &#10005;
-                  </motion.button>
-                </div>
-
-                {/* Event Title */}
-                <div>
-                  <h3 className="text-xl font-semibold leading-snug text-white">
-                    {upcomingEvent.title}
-                  </h3>
-                </div>
-
-                {/* Date & Time Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Date/Time Block */}
-                  <div className="flex items-start gap-3 bg-white/[0.02] border border-white/5 rounded-2xl p-4">
-                    <div className="p-2 bg-[#ff4b4b]/10 text-[#ff4b4b] rounded-lg shrink-0">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="text-[9px] font-bold uppercase tracking-widest text-white/45">Date & Time</div>
-                      <div className="text-xs font-semibold text-white mt-1">
-                        {new Date(upcomingEvent.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
-                      </div>
-                      <div className="text-[11px] text-white/50 mt-0.5">
-                        {new Date(upcomingEvent.date).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Location Block */}
-                  <div className="flex items-start gap-3 bg-white/[0.02] border border-white/5 rounded-2xl p-4">
-                    <div className="p-2 bg-[#ff4b4b]/10 text-[#ff4b4b] rounded-lg shrink-0">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="text-[9px] font-bold uppercase tracking-widest text-white/45">Location</div>
-                      <div className="text-xs font-semibold text-white mt-1">{upcomingEvent.location}</div>
-                      {upcomingEvent.locationLink && (
-                        <a
-                          href={upcomingEvent.locationLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-0.5 text-[11px] text-[#ff4b4b] hover:text-[#ff3d3d] hover:underline font-semibold mt-1 transition-colors"
-                        >
-                          View Map
-                          <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                          </svg>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Description */}
-                {upcomingEvent.description && (
-                  <div className="flex flex-col gap-2">
-                    <div className="text-[9px] font-bold uppercase tracking-widest text-white/45">Event Details</div>
-                    <p className="text-xs text-white/70 leading-relaxed whitespace-pre-wrap max-h-[160px] overflow-y-auto pr-2 custom-scrollbar">
-                      {upcomingEvent.description}
-                    </p>
-                  </div>
-                )}
-
-                {/* Footer Buttons */}
-                <div className="flex items-center gap-3 border-t border-white/10 pt-4 mt-2">
-                  <motion.div
-                    className="flex-[2]"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.97 }}
-                  >
-                    <Link
-                      href={upcomingEvent.rsvpLink || "/join"}
-                      onClick={() => setDetailsOpen(false)}
-                      className="block rounded-xl py-3.5 text-center text-[11px] font-bold uppercase tracking-wider text-white transition-colors hover:brightness-110 bg-[#ff4b4b] shadow-md shadow-red-900/30"
-                    >
-                      RSVP Free &rarr;
-                    </Link>
-                  </motion.div>
-
-                  <button
-                    type="button"
-                    onClick={() => setDetailsOpen(false)}
-                    className="flex-1 rounded-xl border border-white/10 bg-white/[0.04] py-3.5 text-center text-[11px] font-bold uppercase tracking-wider text-white/70 transition-all hover:border-white/30 hover:bg-white/10 hover:text-white cursor-pointer"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <EventDetailsModal
+        isOpen={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        event={upcomingEvent}
+      />
     </>
   );
 }
