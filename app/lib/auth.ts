@@ -3,22 +3,16 @@ import * as jwt from "jsonwebtoken";
 
 export async function verifyAdminSession(): Promise<boolean> {
   try {
-    // 1. Access cookies using cookies() utility from next/headers.
-  const cookieStore = await cookies();
-
-    // 2. Retrieve the "admin_session" cookie value. If missing, return false.
+    // Read the admin session cookie from the request
+    const cookieStore = await cookies();
     const token = cookieStore.get("admin_session")?.value;
     if (!token) return false;
 
-    // 3. Fetch JWT_SECRET from environment variables.
+    // Verify the JWT token against the server secret
     const secret = process.env.JWT_SECRET;
-
     if (!secret) return false;
 
-    // 4. Verify the session token using jwt.verify(token, secret).
-      jwt.verify(token, secret);
-
-    // 5. If verification succeeds, return true. Otherwise return false.
+    jwt.verify(token, secret);
     return true;
 
   } catch {

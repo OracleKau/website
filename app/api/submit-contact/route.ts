@@ -14,25 +14,22 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. TODO: Verify Turnstile Spam Protection token
-    // - Retrieve TURNSTILE_SECRET_KEY from environment variables (process.env.TURNSTILE_SECRET_KEY).
-      const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+    // 2. Verify Cloudflare Turnstile token to block spam submissions
+    const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
 
-    // - Retrieve cfToken sent from frontend. If missing, return a 400 Bad Request error.
-        if (!cfToken) {
+    if (!cfToken) {
       return NextResponse.json(
         { error: "Missing Turnstile token" },
         { status: 400 }
       );
     }
-       if (!turnstileSecret) {
+    if (!turnstileSecret) {
       return NextResponse.json(
         { error: "Server misconfigured (Turnstile secret missing)" },
         { status: 500 }
       );
     }
-    // - Make a POST request to "https://challenges.cloudflare.com/turnstile/v0/siteverify" passing
-    //   `secret` and `response` (token) as application/x-www-form-urlencoded.
+
     const formData = new URLSearchParams();
     formData.append("secret", turnstileSecret);
     formData.append("response", cfToken);
@@ -45,10 +42,7 @@ export async function POST(req: Request) {
       }
     );
 
-    // - Parse JSON response. If validation fails (!verifyResult.success), return a 400 Bad Request
-    //   error saying "Spam check failed, please solve the challenge again."
-
-        const verifyResult = await verifyRes.json();
+    const verifyResult = await verifyRes.json();
     if (!verifyResult.success) {
       return NextResponse.json(
         { error: "Spam check failed, please solve the challenge again." },
@@ -56,7 +50,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3. Save the contact form submission to the SQLite database
+    // 3. Save the contact form submission to the PostgreSQL database
     const submission = await db.contactSubmission.create({
       data: {
         name: name.trim(),
