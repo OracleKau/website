@@ -3,6 +3,11 @@ import { verifyAdminSession } from "@/app/lib/auth";
 import { writeFile, mkdir } from "fs/promises";
 import { join, extname } from "path";
 
+/**
+ * POST /api/upload
+ * Admin-only endpoint to upload image assets.
+ * Saves files locally to 'public/uploads' directory with randomized suffixes to avoid collisions.
+ */
 export async function POST(req: Request) {
   try {
     // 1. Verify the admin session. Only authenticated admins should be allowed to upload files.
@@ -49,4 +54,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
 

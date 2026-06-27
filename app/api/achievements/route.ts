@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import db from "../../lib/db";
 import { verifyAdminSession } from "../../lib/auth";
 
+/**
+ * GET /api/achievements
+ * Public endpoint to fetch all milestones, ordered by year descending.
+ */
 export async function GET() {
   try {
     const achievements = await db.achievement.findMany({
@@ -13,8 +17,13 @@ export async function GET() {
   }
 }
 
+/**
+ * POST /api/achievements
+ * Admin-only endpoint to create a new achievement milestone.
+ */
 export async function POST(req: Request) {
   try {
+    // Authenticate admin session
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -22,10 +31,12 @@ export async function POST(req: Request) {
     const data = await req.json();
     const { year, title, text, imageUrl } = data;
 
+    // Validate payload
     if (!year || !title || !text || !imageUrl) {
       return NextResponse.json({ error: "Required fields missing" }, { status: 400 });
     }
 
+    // Insert new achievement record
     const achievement = await db.achievement.create({
       data: {
         year,
@@ -42,8 +53,13 @@ export async function POST(req: Request) {
   }
 }
 
+/**
+ * PUT /api/achievements
+ * Admin-only endpoint to update an existing achievement milestone.
+ */
 export async function PUT(req: Request) {
   try {
+    // Authenticate admin session
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -55,6 +71,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Achievement ID required" }, { status: 400 });
     }
 
+    // Update target achievement record
     const achievement = await db.achievement.update({
       where: { id },
       data: {
@@ -72,8 +89,13 @@ export async function PUT(req: Request) {
   }
 }
 
+/**
+ * DELETE /api/achievements?id=...
+ * Admin-only endpoint to remove an achievement milestone.
+ */
 export async function DELETE(req: Request) {
   try {
+    // Authenticate admin session
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -85,6 +107,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Achievement ID required" }, { status: 400 });
     }
 
+    // Delete target achievement record
     await db.achievement.delete({
       where: { id },
     });
@@ -95,3 +118,4 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Failed to delete achievement" }, { status: 500 });
   }
 }
+

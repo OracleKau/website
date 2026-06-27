@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import db from "../../lib/db";
 import { verifyAdminSession } from "../../lib/auth";
 
+/**
+ * GET /api/events
+ * Public endpoint to fetch all scheduled events, sorted chronologically ascending.
+ */
 export async function GET() {
   try {
     const events = await db.event.findMany({
@@ -13,8 +17,13 @@ export async function GET() {
   }
 }
 
+/**
+ * POST /api/events
+ * Admin-only endpoint to schedule a new event.
+ */
 export async function POST(req: Request) {
   try {
+    // Verify admin identity
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -22,10 +31,12 @@ export async function POST(req: Request) {
     const data = await req.json();
     const { title, description, date, location, locationLink, type, rsvpLink } = data;
 
+    // Validate request payload
     if (!title || !date || !location || !type) {
       return NextResponse.json({ error: "Required fields missing" }, { status: 400 });
     }
 
+    // Insert new event
     const event = await db.event.create({
       data: {
         title,
@@ -45,8 +56,13 @@ export async function POST(req: Request) {
   }
 }
 
+/**
+ * PUT /api/events
+ * Admin-only endpoint to update details of an existing event.
+ */
 export async function PUT(req: Request) {
   try {
+    // Verify admin identity
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -58,6 +74,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Event ID required" }, { status: 400 });
     }
 
+    // Update target event record
     const event = await db.event.update({
       where: { id },
       data: {
@@ -78,8 +95,13 @@ export async function PUT(req: Request) {
   }
 }
 
+/**
+ * DELETE /api/events?id=...
+ * Admin-only endpoint to delete an event record.
+ */
 export async function DELETE(req: Request) {
   try {
+    // Verify admin identity
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -91,6 +113,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Event ID required" }, { status: 400 });
     }
 
+    // Delete target event record
     await db.event.delete({
       where: { id },
     });
@@ -101,3 +124,4 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Failed to delete event" }, { status: 500 });
   }
 }
+

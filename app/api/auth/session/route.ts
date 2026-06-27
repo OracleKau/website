@@ -2,11 +2,17 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
+/**
+ * GET /api/auth/session
+ * Checks if the user is authenticated by verifying their admin_session cookie.
+ * Used by the client admin layout to toggle routing guards.
+ */
 export async function GET() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("admin_session")?.value;
 
+    // Check if token cookie is present
     if (!token) {
       return NextResponse.json({ authenticated: false }, { status: 401 });
     }
@@ -20,6 +26,7 @@ export async function GET() {
     }
 
     try {
+      // Decode and verify token signature. Throws if invalid or expired.
       jwt.verify(token, jwtSecret);
       return NextResponse.json({ authenticated: true });
     } catch (err) {
@@ -29,3 +36,4 @@ export async function GET() {
     return NextResponse.json({ authenticated: false }, { status: 500 });
   }
 }
+

@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { db } from "@/app/lib/db";
 import { Resend } from "resend";
 
+/**
+ * POST /api/submit-contact
+ * Public endpoint to submit a partnership or sponsorship inquiry.
+ * Performs Cloudflare Turnstile verification, saves to Postgres db, and emails club leadership.
+ */
 export async function POST(req: Request) {
   try {
     const { name, org, email, kind, message, cfToken } = await req.json();
@@ -34,6 +39,7 @@ export async function POST(req: Request) {
     formData.append("secret", turnstileSecret);
     formData.append("response", cfToken);
 
+    // Call Cloudflare siteverify API to validate the Turnstile CAPTCHA response token
     const verifyRes = await fetch(
       "https://challenges.cloudflare.com/turnstile/v0/siteverify",
       {
@@ -73,6 +79,7 @@ export async function POST(req: Request) {
       } else {
         const resend = new Resend(resendApiKey);
 
+        // Format email template using styling tags
         const emailHtml = `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px; background-color: #ffffff; color: #333333;">
             <h2 style="color: #ff3d3d; border-bottom: 2px solid #ff3d3d; padding-bottom: 10px; margin-top: 0;">New Partnership Request</h2>
@@ -105,6 +112,7 @@ export async function POST(req: Request) {
         `;
 
         try {
+          // Send notification email
           await resend.emails.send({
             from: "Oracle Club <onboarding@resend.dev>",
             to: notificationEmail,
@@ -127,3 +135,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

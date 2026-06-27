@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import db from "../../lib/db";
 import { verifyAdminSession } from "../../lib/auth";
 
+/**
+ * GET /api/sponsors
+ * Public endpoint to fetch all active sponsors, sorted chronologically.
+ */
 export async function GET() {
   try {
     const sponsors = await db.sponsor.findMany({
@@ -13,8 +17,13 @@ export async function GET() {
   }
 }
 
+/**
+ * POST /api/sponsors
+ * Admin-only endpoint to add a new sponsor record to the database.
+ */
 export async function POST(req: Request) {
   try {
+    // Verify admin identity
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -22,10 +31,12 @@ export async function POST(req: Request) {
     const data = await req.json();
     const { name, tier, logoUrl } = data;
 
+    // Validate sponsor attributes
     if (!name || !tier || !logoUrl) {
       return NextResponse.json({ error: "Required fields missing" }, { status: 400 });
     }
 
+    // Insert new sponsor record
     const sponsor = await db.sponsor.create({
       data: {
         name,
@@ -41,8 +52,13 @@ export async function POST(req: Request) {
   }
 }
 
+/**
+ * PUT /api/sponsors
+ * Admin-only endpoint to edit an existing sponsor's details.
+ */
 export async function PUT(req: Request) {
   try {
+    // Verify admin identity
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -54,6 +70,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Sponsor ID required" }, { status: 400 });
     }
 
+    // Update target sponsor record
     const sponsor = await db.sponsor.update({
       where: { id },
       data: {
@@ -70,8 +87,13 @@ export async function PUT(req: Request) {
   }
 }
 
+/**
+ * DELETE /api/sponsors?id=...
+ * Admin-only endpoint to remove a sponsor record from website display.
+ */
 export async function DELETE(req: Request) {
   try {
+    // Verify admin identity
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -83,6 +105,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Sponsor ID required" }, { status: 400 });
     }
 
+    // Delete target sponsor record
     await db.sponsor.delete({
       where: { id },
     });
@@ -93,3 +116,4 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Failed to delete sponsor" }, { status: 500 });
   }
 }
+

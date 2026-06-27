@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import db from "../../lib/db";
 import { verifyAdminSession } from "../../lib/auth";
 
+/**
+ * GET /api/members
+ * Public endpoint to fetch all club members, sorted by custom display order index ascending.
+ */
 export async function GET() {
   try {
     const members = await db.member.findMany({
@@ -13,8 +17,13 @@ export async function GET() {
   }
 }
 
+/**
+ * POST /api/members
+ * Admin-only endpoint to add a new member record to the directory.
+ */
 export async function POST(req: Request) {
   try {
+    // Verify admin privileges
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -22,10 +31,12 @@ export async function POST(req: Request) {
     const data = await req.json();
     const { name, role, department, initials, quote, imageUrl, linkedin, github, twitter, email, order, isLeadership } = data;
 
+    // Validate payload constraints
     if (!name || !role || !department || !initials) {
       return NextResponse.json({ error: "Required fields missing" }, { status: 400 });
     }
 
+    // Insert new member record
     const member = await db.member.create({
       data: {
         name,
@@ -50,8 +61,13 @@ export async function POST(req: Request) {
   }
 }
 
+/**
+ * PUT /api/members
+ * Admin-only endpoint to update an existing member's properties.
+ */
 export async function PUT(req: Request) {
   try {
+    // Verify admin privileges
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -63,6 +79,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Member ID required" }, { status: 400 });
     }
 
+    // Update target member record
     const member = await db.member.update({
       where: { id },
       data: {
@@ -88,8 +105,13 @@ export async function PUT(req: Request) {
   }
 }
 
+/**
+ * DELETE /api/members?id=...
+ * Admin-only endpoint to delete a member from directory.
+ */
 export async function DELETE(req: Request) {
   try {
+    // Verify admin privileges
     if (!(await verifyAdminSession())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -101,6 +123,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Member ID required" }, { status: 400 });
     }
 
+    // Remove member from database
     await db.member.delete({
       where: { id },
     });
@@ -111,3 +134,4 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Failed to delete member" }, { status: 500 });
   }
 }
+

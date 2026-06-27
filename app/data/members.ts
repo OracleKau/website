@@ -1,6 +1,18 @@
+// /////////////////////////////////////////////////////////////////////////
+// STATIC MEMBERS DIRECTORY BLUEPRINT
+// /////////////////////////////////////////////////////////////////////////
+// WARNING: This file is a static reference/legacy copy of the initial club roster.
+// It is NOT imported or dynamically read by the website frontend (/members).
+// Instead, the website queries the PostgreSQL database via /api/members.
+// The database is initially populated with these names via 'prisma/seed.js'.
+// Subsequent additions, deletions, or role updates should be performed via the
+// Admin Dashboard UI (/admin) which writes directly to PostgreSQL.
+// /////////////////////////////////////////////////////////////////////////
+
 export const leadership = {
   presidents: [
     { name: "Ammar Essam Koshak",        role: "Club President"                  },
+
     { name: "Joud Yasser Alaskar",       role: "Club President"                  },
     { name: "Mohammed Ahmad Justanieah", role: "Club Vice President"             },
     { name: "Shahad Khalid Kadasa",      role: "Human Resources Officer"         },

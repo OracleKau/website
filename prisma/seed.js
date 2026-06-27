@@ -1,7 +1,19 @@
+// /////////////////////////////////////////////////////////////////////////
+// DATABASE INITIAL SEED SCRIPT
+// /////////////////////////////////////////////////////////////////////////
+// Purpose: Resets and populates the local PostgreSQL database with initial data.
+// Trigger Command: `node prisma/seed.js` or automatic Prisma hook.
+// 
+// WARNING: Running this script clears ALL existing data in the database
+// (including messages, events, or manual adjustments made in the Admin Dashboard).
+// Do NOT run this in production unless you explicitly intend to reset the database.
+// /////////////////////////////////////////////////////////////////////////
+
 const { PrismaClient } = require("@prisma/client");
 const db = new PrismaClient();
 
 async function main() {
+  // 1. Clear all existing records to avoid unique constraint or primary key collisions
   console.log("Cleaning database...");
   await db.member.deleteMany({});
   await db.project.deleteMany({});
@@ -9,6 +21,7 @@ async function main() {
   await db.sponsor.deleteMany({});
   await db.contactSubmission.deleteMany({});
   await db.event.deleteMany({});
+
 
   console.log("Seeding achievements...");
   const achievements = [
