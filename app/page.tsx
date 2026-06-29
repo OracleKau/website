@@ -28,12 +28,26 @@ export default function Home() {
   const [showEventCard, setShowEventCard] = useState(true);
   const [upcomingEvent, setUpcomingEvent] = useState<Event | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  
+  const [statsData, setStatsData] = useState({ memberCount: 70, projectCount: 3, eventCount: 3 });
+
   // Read runtime environment variable flags to verify if join registrations are active
   const isRegOpen = process.env.NEXT_PUBLIC_REGISTRATION_OPEN === "true";
 
-  // Fetch the current upcoming scheduled event from API endpoint on mount
+  // Fetch stats and the current upcoming scheduled event from API endpoint on mount
   useEffect(() => {
+    fetch("/api/stats")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && !data.error) {
+          setStatsData({
+            memberCount: data.memberCount ?? 70,
+            projectCount: data.projectCount ?? 3,
+            eventCount: data.eventCount ?? 3,
+          });
+        }
+      })
+      .catch((err) => console.error("Error fetching stats:", err));
+
     fetch("/api/events/upcoming")
       .then((res) => res.json())
       .then((data) => {
@@ -47,11 +61,7 @@ export default function Home() {
   }, []);
 
   // Professional academic and technical stats counters list
-  const stats = [
-    { num: "70+", label: "Active Members" },
-    { num: "10+", label: "Live Projects" },
-    { num: "5+", label: "Workshops" },
-  ];
+
 
   // Helper utility function calculating day offsets to display localized calendar text
   const getDaysLeftText = (dateStr: string) => {
@@ -61,7 +71,7 @@ export default function Home() {
     const d2 = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
     const diffMs = d1 - d2;
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) return "Next event today";
     if (diffDays === 1) return "Next event tomorrow";
     if (diffDays > 1) return `Next event in ${diffDays} days`;
@@ -71,7 +81,7 @@ export default function Home() {
   return (
     <>
       {/* ───────────────── BACKGROUND VISUAL LAYERS (Orbital Theme) ───────────────── */}
-      
+
       {/* Deep baseline background gradient overlay */}
       <div
         className="fixed inset-0 z-0"
@@ -184,7 +194,7 @@ export default function Home() {
               transition={{ delay: 0.25, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
               className="font-BANANA text-[64px] md:text-[96px] font-medium leading-[0.95] tracking-tight text-white mb-6"
             >
-              Bridging Theory 
+              Bridging Theory
               and Practice.<br />
               Building <span className="text-[#ff4b4b]">Real Impact.</span>
             </motion.h1>
@@ -227,30 +237,7 @@ export default function Home() {
               </motion.div>
             </motion.div>
 
-            {/* Metrics counter grid listing active stats */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
-              className="mt-16 flex flex-wrap gap-10 md:gap-16 pt-8 border-t border-white/10 max-w-[600px]"
-            >
-              {stats.map((stat, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.72 + i * 0.08 }}
-                  className="flex flex-col gap-1"
-                >
-                  <div className="text-[38px] font-semibold leading-none tracking-tight text-white drop-shadow-md">
-                    {stat.num}
-                  </div>
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#ff4b4b]">
-                    {stat.label}
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
+
           </div>
 
         </div>

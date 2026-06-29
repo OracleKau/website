@@ -1,9 +1,20 @@
-// app/join/page.tsx
+// /////////////////////////////////////////////////////////////////////////
+// JOIN / REGISTRATION BETA PAGE
+// /////////////////////////////////////////////////////////////////////////
+// This page is currently disabled and inaccessible to public visitors.
+// Anyone attempting to navigate directly to `/join` will be immediately
+// redirected back to the homepage (`/`).
+// 
+// TO REACTIVATE: Simply delete or comment out the `redirect("/")` call inside
+// the `JoinUs` component below.
+// /////////////////////////////////////////////////////////////////////////
+
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { redirect } from "next/navigation";
 
 /* ─────────────────── DATA ─────────────────── */
 
@@ -15,43 +26,43 @@ const openRoles = [
     color: "#ff4b4b",
     roles: [
       { title: "Frontend Developer", spots: 3, skills: ["React", "TypeScript", "Tailwind"] },
-      { title: "Backend Developer",  spots: 2, skills: ["Node.js", "PostgreSQL", "REST APIs"] },
-      { title: "AI / ML Engineer",   spots: 2, skills: ["Python", "PyTorch", "LLMs"] },
+      { title: "Backend Developer", spots: 2, skills: ["Node.js", "PostgreSQL", "REST APIs"] },
+      { title: "AI / ML Engineer", spots: 2, skills: ["Python", "PyTorch", "LLMs"] },
     ],
   },
   {
     dept: "Design",
     color: "#ff8c4b",
     roles: [
-      { title: "UI/UX Designer",       spots: 2, skills: ["Figma", "Prototyping", "Design Systems"] },
-      { title: "Motion Designer",      spots: 1, skills: ["After Effects", "Lottie", "SVG Animation"] },
+      { title: "UI/UX Designer", spots: 2, skills: ["Figma", "Prototyping", "Design Systems"] },
+      { title: "Motion Designer", spots: 1, skills: ["After Effects", "Lottie", "SVG Animation"] },
     ],
   },
   {
     dept: "Operations",
     color: "#ffcf4b",
     roles: [
-      { title: "Events Coordinator",   spots: 2, skills: ["Planning", "Logistics", "Communication"] },
-      { title: "Marketing & Content",  spots: 2, skills: ["Copywriting", "Social Media", "Photography"] },
-      { title: "Sponsorship Lead",     spots: 1, skills: ["Sales", "Partnerships", "Outreach"] },
+      { title: "Events Coordinator", spots: 2, skills: ["Planning", "Logistics", "Communication"] },
+      { title: "Marketing & Content", spots: 2, skills: ["Copywriting", "Social Media", "Photography"] },
+      { title: "Sponsorship Lead", spots: 1, skills: ["Sales", "Partnerships", "Outreach"] },
     ],
   },
 ];
 
 const members = [
-  { name: "Ammar Essam Koshak",        role: "Club President",              dept: "Leadership",   avatar: "A", calendly: "#", email: "ammar.koshak@kau.edu.sa" },
-  { name: "Joud Yasser Alaskar",       role: "Club President",              dept: "Leadership",   avatar: "J", calendly: "#", email: "joud.alaskar@kau.edu.sa" },
-  { name: "Mohammed Ahmad Justanieah", role: "Club Vice President",         dept: "Leadership",   avatar: "M", calendly: "#", email: "mohammed.justanieah@kau.edu.sa" },
-  { name: "Shahad Khalid Kadasa",      role: "Human Resources Officer",     dept: "Operations",   avatar: "S", calendly: "#", email: "shahad.kadasa@kau.edu.sa" },
-  { name: "Wihad Ahmed Alotaibi",      role: "Tech Department Leader",      dept: "Engineering",  avatar: "W", calendly: "#", email: "wihad.otaibi@kau.edu.sa" },
-  { name: "Sedra Faisal Alyamani",     role: "Public Relations Leader",     dept: "Operations",   avatar: "S", calendly: "#", email: "sedra.yamani@kau.edu.sa" },
+  { name: "Ammar Essam Koshak", role: "Club President", dept: "Leadership", avatar: "A", calendly: "#", email: "ammar.koshak@kau.edu.sa" },
+  { name: "Joud Yasser Alaskar", role: "Club President", dept: "Leadership", avatar: "J", calendly: "#", email: "joud.alaskar@kau.edu.sa" },
+  { name: "Mohammed Ahmad Justanieah", role: "Club Vice President", dept: "Leadership", avatar: "M", calendly: "#", email: "mohammed.justanieah@kau.edu.sa" },
+  { name: "Shahad Khalid Kadasa", role: "Human Resources Officer", dept: "Operations", avatar: "S", calendly: "#", email: "shahad.kadasa@kau.edu.sa" },
+  { name: "Wihad Ahmed Alotaibi", role: "Tech Department Leader", dept: "Engineering", avatar: "W", calendly: "#", email: "wihad.otaibi@kau.edu.sa" },
+  { name: "Sedra Faisal Alyamani", role: "Public Relations Leader", dept: "Operations", avatar: "S", calendly: "#", email: "sedra.yamani@kau.edu.sa" },
 ];
 
 const deptColors: Record<string, string> = {
-  Leadership:  "#ff4b4b",
+  Leadership: "#ff4b4b",
   Engineering: "#4b8fff",
-  Design:      "#ff8c4b",
-  Operations:  "#4bffb5",
+  Design: "#ff8c4b",
+  Operations: "#4bffb5",
 };
 
 /* ─────────────────── BACKGROUND ─────────────────── */
@@ -226,7 +237,28 @@ function MemberCard({ m }: { m: typeof members[0] }) {
 /* ─────────────────── PAGE ─────────────────── */
 
 export default function JoinUs() {
+  // Prevent access to this page if registrations/applications are closed in env
+  if (!APPLICATIONS_OPEN) {
+    redirect("/");
+  }
+
   const [activeDept, setActiveDept] = useState<string | null>(null);
+  const [statsData, setStatsData] = useState({ memberCount: 70, departmentCount: 3, email: "hello@oracle-kau.sa" });
+
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && !data.error) {
+          setStatsData({
+            memberCount: data.memberCount,
+            departmentCount: data.departmentCount,
+            email: data.email || "hello@oracle-kau.sa",
+          });
+        }
+      })
+      .catch((err) => console.error("Error fetching stats:", err));
+  }, []);
 
   const filteredGroups = activeDept
     ? openRoles.filter(g => g.dept === activeDept)
@@ -336,10 +368,10 @@ export default function JoinUs() {
               className="mt-24 pt-10 border-t border-white/[0.08] grid grid-cols-2 md:grid-cols-4 gap-10"
             >
               {[
-                { value: "70+", label: "Active Members",    note: "CS, AI & Engineering" },
-                { value: "3",    label: "Departments",       note: "Engineering, Design, Ops" },
-                { value: "15+",  label: "Open Roles",        note: "Across all departments" },
-                { value: "48h",  label: "Response Time",     note: "After applying" },
+                { value: `${statsData.memberCount}+`, label: "Active Members", note: "KAU Jeddah students" },
+                { value: `${statsData.departmentCount}`, label: "Departments", note: "Tech, Media & PR" },
+                { value: "15+", label: "Open Roles", note: "Across all departments" },
+                { value: "Active", label: "Recruitment", note: "During cycles" },
               ].map((s, i) => (
                 <div key={i} className="text-center">
                   <div className="text-[40px] font-semibold tracking-tight leading-none mb-1">{s.value}</div>
@@ -371,7 +403,7 @@ export default function JoinUs() {
                 </h2>
                 <p className="text-white/45 text-sm leading-relaxed max-w-[380px] mb-8">
                   We open applications once or twice a year. Leave your email and we&apos;ll send
-                  you a heads-up the moment the next cycle opens — no spam, ever.
+                  you a heads-up the moment the next cycle opens.
                 </p>
                 <NotifyForm />
               </motion.div>
@@ -387,9 +419,9 @@ export default function JoinUs() {
                   What happens after you apply
                 </div>
                 {[
-                  { step: "01", title: "Application review",    desc: "We read every application carefully. Usually takes 3–5 days." },
-                  { step: "02", title: "Short interview",        desc: "A 20-minute call with one of our leads — no prep needed, just a conversation." },
-                  { step: "03", title: "Decision & onboarding", desc: "You'll hear back within 48 hours of the interview. If it's a yes, we get you set up right away." },
+                  { step: "01", title: "Application review", desc: "We read every application carefully. Usually takes 3–5 days." },
+                  { step: "02", title: "Short interview", desc: "A 20-minute call with one of our leads — no prep needed, just a conversation." },
+                  { step: "03", title: "Decision & onboarding", desc: "You'll hear back shortly after the interview. If it's a yes, we get you set up right away." },
                 ].map((item, i) => (
                   <div key={i} className="flex gap-5 items-start">
                     <span className="text-[11px] text-[#ff4b4b] font-semibold tabular-nums mt-0.5 shrink-0">{item.step}</span>
@@ -578,7 +610,7 @@ export default function JoinUs() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-white/40 text-sm max-w-[280px] leading-relaxed md:text-right"
               >
-                Message any of our leads directly, or book a short 1-on-1 call — 
+                Message any of our leads directly, or book a short 1-on-1 call —
                 no formality, just a conversation.
               </motion.p>
             </div>
@@ -612,10 +644,10 @@ export default function JoinUs() {
                 </div>
               </div>
               <a
-                href="mailto:hello@oracle-kau.sa"
+                href={`mailto:${statsData.email}`}
                 className="shrink-0 border border-white/20 text-white/80 text-[11px] font-semibold px-6 py-3 rounded-full hover:border-white/40 hover:text-white transition-all duration-300 whitespace-nowrap"
               >
-                hello@oracle-kau.sa →
+                {statsData.email} →
               </a>
             </motion.div>
           </div>

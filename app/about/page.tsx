@@ -6,7 +6,7 @@
 
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Drop object signature describing coordinate parameters for drawing canvas columns
 type Drop = {
@@ -20,6 +20,23 @@ type Drop = {
 export default function About() {
   // Reference hook pointing directly to the HTML5 canvas element
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [statsData, setStatsData] = useState({ memberCount: 70, projectCount: 3, departmentCount: 3 });
+
+  // Fetch dynamic database statistics on mount
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && !data.error) {
+          setStatsData({
+            memberCount: data.memberCount,
+            projectCount: data.projectCount,
+            departmentCount: data.departmentCount,
+          });
+        }
+      })
+      .catch((err) => console.error("Error fetching stats:", err));
+  }, []);
 
   // Initialize and run the binary matrix rain animation loop on layout mount
   useEffect(() => {
@@ -183,22 +200,22 @@ export default function About() {
           >
             <h1 className="font-black leading-[1.1] tracking-tight text-white mb-8">
               <span className="block text-[32px] sm:text-[56px] lg:text-[72px]">
-                More than a <span className="text-[#ff4b4b]">Study Group</span>.
+                About <span className="text-[#ff4b4b]">Oracle Club</span>.
               </span>
               <span className="block text-[32px] sm:text-[56px] lg:text-[72px] mt-2 sm:mt-0">
-                We Learn. We Build. We Lead.
+                Who We Are & What We Do
               </span>
             </h1>
 
             <div className="space-y-6 text-white/70 text-[16px] sm:text-[17px] leading-[1.8] max-w-[580px] font-medium">
               <p className="hover:text-white transition-colors duration-300">
-                Most students study tech without building real systems. This club changes that by focusing on rigorous, real-world engineering experience.
+                Founded in 2026 at King Abdulaziz University (KAU) in Jeddah, the Oracle Student Club is a tech-driven community focused on bridging the gap between classroom theory and real-world engineering.
               </p>
               <p className="hover:text-white transition-colors duration-300">
-                Members collaborate closely on projects, participate in fast-paced hackathons, and build complete products that simulate modern industry environments.
+                Our Tech, Media, and Public Relations departments work in synergy to build production-grade web systems (like our internal operations hubs and campus event check-in platforms), host hands-on workshops on Cloud computing (OCI) and UX design, and partner with regional tech organizations.
               </p>
               <p className="hover:text-white transition-colors duration-300">
-                Founded at KAU Jeddah in 2026, we bring together ambitious students who want to push boundaries and grow far beyond traditional classroom learning.
+                We provide ambitious students with an environment that simulates modern software companies—where they can design, develop, publish products, and acquire professional certifications to build high-impact tech careers.
               </p>
             </div>
           </motion.div>
@@ -209,9 +226,9 @@ export default function About() {
           {/* RIGHT SECTION: Metric statistics layout counters */}
           <div className="w-full lg:pl-20 grid grid-cols-3 lg:grid-cols-1 gap-8 lg:gap-0">
             {[
-              { num: "70+", label: "Active\nMembers" },
-              { num: "3+",  label: "Live\nProjects" },
-              { num: "4",   label: "Departments" },
+              { num: `${statsData.memberCount}+`, label: "Active\nMembers" },
+              { num: `${statsData.projectCount}+`, label: "Live\nProjects" },
+              { num: `${statsData.departmentCount}`, label: "Departments" },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -233,4 +250,4 @@ export default function About() {
       </main>
     </>
   );
-}
+}

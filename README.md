@@ -183,6 +183,7 @@ oracle-club-website/
 │   │   ├── events/           # Events CRUD + upcoming
 │   │   ├── contacts/         # Partnership submissions
 │   │   ├── submit-contact/   # Public contact form endpoint
+│   │   ├── stats/            # Database statistics endpoint
 │   │   └── upload/           # Image upload endpoint
 │   └── lib/
 │       ├── db.ts             # Prisma client singleton
@@ -192,6 +193,7 @@ oracle-club-website/
 │   └── seed.js               # Initial data seed script
 ├── public/                   # Static assets (logos, images, fonts)
 ├── docker-compose.yml        # PostgreSQL container config
+├── .env.example              # Environment variables template
 └── .env                      # Environment variables (not committed)
 ```
 
@@ -208,11 +210,42 @@ oracle-club-website/
 
 ---
 
-## Production Deployment Notes
+## Production Deployment Guide
 
-Before deploying to production:
-1. Change `ADMIN_PASSWORD` to a strong password
-2. Replace `JWT_SECRET` with a securely generated random string
-3. Set `RESEND_API_KEY` to a real Resend API key
-4. Point `DATABASE_URL` to your hosted PostgreSQL instance
-5. Set `NEXT_PUBLIC_REGISTRATION_OPEN` to `"true"` when applications open
+Follow these steps to deploy the application to production:
+
+### 1. Database Provisioning (PostgreSQL)
+Provision a production-ready PostgreSQL instance on a cloud provider like **Supabase** or **Neon.tech**.
+- Set up a new database instance.
+- Copy the transaction-connection string (for Neon or Supabase, usually looks like: `postgresql://username:password@host/database`).
+
+### 2. Push Database Schema & Seed Initial Data
+Before building the app, push the schema tables and seed the database with the initial club information:
+1. Temporarily edit your local `.env` database URL:
+   ```env
+   DATABASE_URL="your-production-database-connection-string"
+   ```
+2. Run the database push command to create all tables:
+   ```bash
+   npx prisma db push
+   ```
+3. Seed the initial club members, departments, achievements, and projects:
+   ```bash
+   node prisma/seed.js
+   ```
+4. Restore your local `.env` database URL back to `localhost` to avoid accidental overrides.
+
+### 3. Deploy App Server (Next.js via Vercel)
+Deploying on **Vercel** is recommended for Next.js applications:
+1. Import the project repository to Vercel.
+2. In the project **Settings > Environment Variables**, configure the production variables (refer to `.env.example` in the root folder):
+   - `DATABASE_URL`: The production database connection string.
+   - `ADMIN_EMAIL`: The login email for the back-office admin dashboard.
+   - `ADMIN_PASSWORD`: A secure, strong password for the admin login.
+   - `JWT_SECRET`: A long, randomly generated secure string for session security.
+   - `RESEND_API_KEY`: API Key from [Resend.com](https://resend.com) for partnership contact emails.
+   - `NOTIFICATION_RECEIVER_EMAIL`: The email address where form submissions should be routed.
+   - `NEXT_PUBLIC_TURNSTILE_SITE_KEY` & `TURNSTILE_SECRET_KEY`: Keys from Cloudflare Turnstile dashboard.
+   - `NEXT_PUBLIC_REGISTRATION_OPEN`: Set to `true` when recruitment cycles are open, or `false` to redirect `/join` to home.
+3. Click **Deploy**. Vercel will build the application, optimize pages, and launch the site.
+

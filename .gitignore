@@ -43,3 +43,6 @@ next-env.d.ts
 # database files
 *.db
 *.db-journal
+
+# Allow committing env template
+!.env.example

@@ -22,34 +22,19 @@ const heroStats = [
 // Activities catalog detailing club programs
 const activities = [
   {
-    tag: "Annual",
-    name: "OracleHack",
-    desc: "Our flagship hackathon. Teams of 2–4 build and pitch a project in 24 hours. Open to all KAU students, judged by industry mentors.",
-  },
-  {
-    tag: "Monthly",
-    name: "Tech Talk Series",
-    desc: "Practitioners from local and regional companies come in to share real-world experience with our members.",
-  },
-  {
-    tag: "Semester",
-    name: "Career Fair",
-    desc: "A focused recruitment event where companies meet, interview, and recruit directly from our member community.",
-  },
-  {
     tag: "Ongoing",
-    name: "Workshops",
-    desc: "Hands-on skill sessions on topics like AI, web development, cloud, and data — run by members or hosted by a partner company.",
+    name: "Technical Workshops",
+    desc: "Hands-on skill sessions on topics like AI, web development, cloud architectures, and data engineering. These are run by senior members or hosted in collaboration with partner companies.",
   },
   {
     tag: "Ongoing",
     name: "Open Projects",
-    desc: "Members work in small teams on self-directed technical projects, with guidance from faculty and alumni mentors.",
+    desc: "Members collaborate in small teams to build, deploy, and maintain self-directed technical products. These projects solve real problems for our campus community and serve as hands-on learning experiences.",
   },
   {
-    tag: "Annual",
-    name: "Demo Day",
-    desc: "End-of-year showcase where project teams present finished work to students, faculty, and invited industry guests.",
+    tag: "Event",
+    name: "Interactive Booths",
+    desc: "We host interactive booths at major university events and exhibitions, allowing us to showcase our student-built projects and engage directly with students, faculty, and industry visitors.",
   },
 ];
 
@@ -172,9 +157,25 @@ export default function Sponsors() {
   const [cfToken, setCfToken] = useState<string | null>(null);
   const [turnstileLoaded, setTurnstileLoaded] = useState(false);
   const turnstileRef = useRef<HTMLDivElement>(null);
+  const [statsData, setStatsData] = useState({ memberCount: 70, projectCount: 3, departmentCount: 3, email: "sponsors@oracle-kau.sa" });
 
   // Hook registering Turnstile callbacks and initiating sponsors database fetches
   useEffect(() => {
+    // Fetch dynamic stats
+    fetch("/api/stats")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && !data.error) {
+          setStatsData({
+            memberCount: data.memberCount,
+            projectCount: data.projectCount,
+            departmentCount: data.departmentCount,
+            email: data.email || "sponsors@oracle-kau.sa",
+          });
+        }
+      })
+      .catch((err) => console.error("Error fetching stats:", err));
+
     // Register global callbacks for Turnstile
     (window as any).onTurnstileSuccess = (token: string) => {
       setCfToken(token);
@@ -257,6 +258,12 @@ export default function Sponsors() {
     }
   }
 
+  const dynamicStats = [
+    { value: `${statsData.memberCount}+`, label: "Active Members", note: "KAU Jeddah students" },
+    { value: `${statsData.projectCount}+`, label: "Live Projects", note: "Shipped & maintained" },
+    { value: `${statsData.departmentCount}`, label: "Core Departments", note: "Tech, Media & PR" },
+  ];
+
   return (
     <>
       <Background />
@@ -330,7 +337,7 @@ export default function Sponsors() {
               transition={{ duration: 0.7, delay: 0.3 }}
               className="mt-24 pt-10 border-t border-white/[0.08] grid grid-cols-2 md:grid-cols-3 gap-10 text-center"
             >
-              {heroStats.map((s, i) => (
+              {dynamicStats.map((s, i) => (
                 <div key={i}>
                   <div className="text-[40px] font-semibold tracking-tight leading-none mb-1">{s.value}</div>
                   <div className="text-sm text-white font-medium mb-0.5">{s.label}</div>
@@ -539,8 +546,8 @@ export default function Sponsors() {
 
               <div className="flex flex-col gap-5 mb-10">
                 {[
-                  { icon: "@", label: "Email", value: "sponsors@oracle-kau.sa", href: "mailto:sponsors@oracle-kau.sa" },
-                  { icon: "✕", label: "Twitter / X", value: "@OracleKAU", href: "https://twitter.com/OracleKAU" },
+                  { icon: "@", label: "Email", value: statsData.email, href: `mailto:${statsData.email}` },
+                  { icon: "✕", label: "Twitter / X", value: "@Oracle_KAU", href: "https://twitter.com/Oracle_KAU" },
                 ].map((c, i) => (
                   <a
                     key={i}
@@ -601,7 +608,7 @@ export default function Sponsors() {
                     ✓
                   </div>
                   <div className="font-semibold text-lg">Message sent!</div>
-                  <div className="text-white/40 text-sm">We&apos;ll be in touch within 48 hours.</div>
+                  <div className="text-white/40 text-sm">We&apos;ll be in touch soon.</div>
                 </div>
               ) : (
                 // Base input structure layout fields
@@ -705,10 +712,6 @@ export default function Sponsors() {
                   >
                     {isSubmitting ? "Sending..." : "Send message →"}
                   </button>
-
-                  <p className="text-center text-white/20 text-[10px]">
-                    We respond within 48 hours. No spam, ever.
-                  </p>
                 </div>
               )}
             </motion.div>

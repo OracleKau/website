@@ -15,8 +15,23 @@ interface Achievement {
 
 export default function Achievements() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [statsData, setStatsData] = useState({ memberCount: 70, projectCount: 3, departmentCount: 3, eventCount: 5 });
 
   useEffect(() => {
+    fetch("/api/stats")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && !data.error) {
+          setStatsData({
+            memberCount: data.memberCount ?? 70,
+            projectCount: data.projectCount ?? 3,
+            departmentCount: data.departmentCount ?? 3,
+            eventCount: data.eventCount ?? 3,
+          });
+        }
+      })
+      .catch((err) => console.error("Error fetching stats:", err));
+
     fetch("/api/achievements")
       .then((res) => res.json())
       .then((data) => {
@@ -54,9 +69,9 @@ export default function Achievements() {
           <svg viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="80" y="80" width="200" height="200" stroke="rgba(180,30,30,0.22)" strokeWidth="1.2" />
             <rect x="140" y="140" width="200" height="200" stroke="rgba(180,30,30,0.14)" strokeWidth="1" />
-            <line x1="80"  y1="80"  x2="140" y2="140" stroke="rgba(180,30,30,0.18)" strokeWidth="1" />
-            <line x1="280" y1="80"  x2="340" y2="140" stroke="rgba(180,30,30,0.18)" strokeWidth="1" />
-            <line x1="80"  y1="280" x2="140" y2="340" stroke="rgba(180,30,30,0.18)" strokeWidth="1" />
+            <line x1="80" y1="80" x2="140" y2="140" stroke="rgba(180,30,30,0.18)" strokeWidth="1" />
+            <line x1="280" y1="80" x2="340" y2="140" stroke="rgba(180,30,30,0.18)" strokeWidth="1" />
+            <line x1="80" y1="280" x2="140" y2="340" stroke="rgba(180,30,30,0.18)" strokeWidth="1" />
             <line x1="280" y1="280" x2="340" y2="340" stroke="rgba(180,30,30,0.18)" strokeWidth="1" />
           </svg>
         </motion.div>
@@ -71,9 +86,9 @@ export default function Achievements() {
           <svg viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="50" y="50" width="140" height="140" stroke="rgba(160,25,25,0.20)" strokeWidth="1.2" />
             <rect x="90" y="90" width="140" height="140" stroke="rgba(160,25,25,0.12)" strokeWidth="1" />
-            <line x1="50"  y1="50"  x2="90"  y2="90"  stroke="rgba(160,25,25,0.16)" strokeWidth="1" />
-            <line x1="190" y1="50"  x2="230" y2="90"  stroke="rgba(160,25,25,0.16)" strokeWidth="1" />
-            <line x1="50"  y1="190" x2="90"  y2="230" stroke="rgba(160,25,25,0.16)" strokeWidth="1" />
+            <line x1="50" y1="50" x2="90" y2="90" stroke="rgba(160,25,25,0.16)" strokeWidth="1" />
+            <line x1="190" y1="50" x2="230" y2="90" stroke="rgba(160,25,25,0.16)" strokeWidth="1" />
+            <line x1="50" y1="190" x2="90" y2="230" stroke="rgba(160,25,25,0.16)" strokeWidth="1" />
             <line x1="190" y1="190" x2="230" y2="230" stroke="rgba(160,25,25,0.16)" strokeWidth="1" />
           </svg>
         </motion.div>
@@ -104,7 +119,7 @@ export default function Achievements() {
             <polygon points="100,15 185,165 15,165" stroke="rgba(170,28,28,0.22)" strokeWidth="1.2" fill="none" />
             <polygon points="100,45 160,155 40,155" stroke="rgba(170,28,28,0.13)" strokeWidth="1" fill="none" />
             <line x1="100" y1="15" x2="100" y2="165" stroke="rgba(170,28,28,0.10)" strokeWidth="1" />
-            <line x1="15"  y1="165" x2="100" y2="90" stroke="rgba(170,28,28,0.10)" strokeWidth="1" />
+            <line x1="15" y1="165" x2="100" y2="90" stroke="rgba(170,28,28,0.10)" strokeWidth="1" />
             <line x1="185" y1="165" x2="100" y2="90" stroke="rgba(170,28,28,0.10)" strokeWidth="1" />
           </svg>
         </motion.div>
@@ -136,7 +151,7 @@ export default function Achievements() {
           <svg viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
             <polygon points="70,8 126,39 126,101 70,132 14,101 14,39" stroke="rgba(185,30,30,0.22)" strokeWidth="1.2" fill="none" />
             <polygon points="70,26 108,47 108,93 70,114 32,93 32,47" stroke="rgba(185,30,30,0.12)" strokeWidth="1" fill="none" />
-            {[0,1,2,3,4,5].map(i => {
+            {[0, 1, 2, 3, 4, 5].map(i => {
               const a = (i * 60 - 90) * Math.PI / 180;
               return <line key={i} x1="70" y1="70" x2={70 + 62 * Math.cos(a)} y2={70 + 62 * Math.sin(a)} stroke="rgba(185,30,30,0.09)" strokeWidth="1" />;
             })}
@@ -248,15 +263,16 @@ export default function Achievements() {
             className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-28"
           >
             {[
-              { num: "70+", label: "Members" },
-              { num: "3",   label: "Projects" },
-              { num: "10+", label: "Events" },
-              { num: "4",   label: "Departments" },
+              { num: `${statsData.memberCount}+`, label: "Members" },
+              { num: `${statsData.projectCount}+`, label: "Projects" },
+              { num: `${statsData.eventCount}+`, label: "Workshops" },
+              { num: `${statsData.departmentCount}`, label: "Departments" },
             ].map((s, i) => (
               <motion.div
                 key={i}
-                whileHover={{ y: -6, scale: 1.02 }}
+                whileHover={{ y: -6 }}
                 className="border border-white/10 bg-white/[0.03] backdrop-blur-xl rounded-3xl p-8 text-center"
+                style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden", transform: "translate3d(0,0,0)" }}
               >
                 <div className="text-[52px] font-semibold text-white mb-3">{s.num}</div>
                 <div className="text-[11px] tracking-[0.22em] uppercase text-[#ff4b4b]">{s.label}</div>
@@ -291,8 +307,9 @@ export default function Achievements() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                whileHover={{ y: -10, scale: 1.02 }}
+                whileHover={{ y: -10 }}
                 className="group bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-[30px] overflow-hidden"
+                style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden", transform: "translate3d(0,0,0)" }}
               >
                 <div className="relative overflow-hidden">
                   <motion.img

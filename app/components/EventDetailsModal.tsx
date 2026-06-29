@@ -138,19 +138,25 @@ export default function EventDetailsModal({ isOpen, onClose, event }: EventDetai
 
               {/* Footer Buttons triggers RSVP and close actions */}
               <div className="flex items-center gap-3 border-t border-white/10 pt-4 mt-2">
-                <motion.div
-                  className="flex-[2]"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  <Link
-                    href={event.rsvpLink || "/join"}
-                    onClick={onClose}
-                    className="block rounded-xl py-3.5 text-center text-[11px] font-bold uppercase tracking-wider text-white transition-colors hover:brightness-110 bg-[#ff4b4b] shadow-md shadow-red-900/30"
+                {event && new Date(event.date) < new Date() ? (
+                  <div className="flex-[2] rounded-xl py-3.5 text-center text-[11px] font-bold uppercase tracking-wider text-white/40 bg-white/[0.04] border border-white/10 cursor-default select-none">
+                    Event Ended
+                  </div>
+                ) : (
+                  <motion.div
+                    className="flex-[2]"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
                   >
-                    RSVP Free &rarr;
-                  </Link>
-                </motion.div>
+                    <Link
+                      href={event.rsvpLink || "/join"}
+                      onClick={onClose}
+                      className="block rounded-xl py-3.5 text-center text-[11px] font-bold uppercase tracking-wider text-white transition-colors hover:brightness-110 bg-[#ff4b4b] shadow-md shadow-red-900/30"
+                    >
+                      RSVP Free &rarr;
+                    </Link>
+                  </motion.div>
+                )}
 
                 <button
                   type="button"
