@@ -80,6 +80,13 @@ export default function RootLayout({
           rel="apple-touch-icon"
           href="/icon.png?v=5"
         />
+
+        {/* Umami analytics — self-hosted, privacy-respecting */}
+        <script
+          defer
+          src="https://analytics.oraclekau.club/script.js"
+          data-website-id="c8c482ff-5769-4a03-bf1f-d0e9e6a7aadc"
+        />
       </head>
 
       {/* Initialize global theme style attributes (such as the default background, white text, smooth anti-aliasing, and responsive boundaries) */}
@@ -88,4 +95,4 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+}
